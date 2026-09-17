@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  PESERTA
+}
+
+enum ApplicationStatus {
+  DIAJUKAN
+  DALAM_VERIFIKASI
+  PERLU_PERBAIKAN
+  DITERIMA
+  DITOLAK
+  DIBATALKAN
+}
+
+enum DocumentCategory {
+  PENGAJUAN
+  SURAT
+  PENYELESAIAN
+  ADMINISTRASI
+}
+
+enum CompletionStatus {
+  DIAJUKAN
+  DISETUJUI
+  PERLU_PERBAIKAN
+  DITOLAK
+}
+
+enum LetterType {
+  PENERIMAAN
+  SELESAI
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String?
+  role              Role     @default(PESERTA)
+  name              String
+  isActive          Boolean  @default(true)
+  setupToken        String?  @unique
+  setupTokenExpires DateTime?
+  createdAt         DateTime @default(now())
+
+  application   Application? @relation("UserApplication")
+  applicationId String?      @unique
+
+  roomSchedules       RoomSchedule[]
+  completionRequests  CompletionRequest[]
+  letters             Letter[]
+  uploadedDocuments   Document[]           @relation("UploadedByUser")
+  auditLogs           AuditLog[]
+}
+
+model Division {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  applications Application[]
+}
+
+model Application {
+  id             String            @id @default(cuid())
+  nomorPengajuan String            @unique
+  status         ApplicationStatus @default(DIAJUKAN)
+
+  // data pribadi
+  namaLengkap  String
+  email        String
+  telepon      String
+  alamat       String?
+  tanggalLahir DateTime?
+
+  // data pendidikan
+  institusi     String
+  fakultas      String?
+  programStudi  String?
+  nimNis        String?
+  semesterKelas String?
+
+  // data magang
+  jenisMagang     String?
+  rencanaMulai    DateTime
+  rencanaSelesai  DateTime
+  durasi          String?
+  divisiId        String?
+  divisi          Division? @relation(fields: [divisiId], references: [id])
+  catatan         String?
+
+  // keputusan admin
+  catatanAdmin String?
+  alasanTolak  String?
+  decidedAt    DateTime?
+  decidedById  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  documents          Document[]
+  completionRequests CompletionRequest[]
+  letters            Letter[]
+
+  user   User?   @relation("UserApplication", fields: [userId], references: [id])
+  userId String? @unique
+}
+
+model Document {
+  id         String           @id @default(cuid())
+  category   DocumentCategory
+  type       String
+  fileName   String
+  storedPath String
+  mimeType   String
+  size       Int
+
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id])
+
+  uploadedById String?
+  uploadedBy   User?   @relation("UploadedByUser", fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Room {
+  id        String         @id @default(cuid())
+  name      String         @unique
+  schedules RoomSchedule[]
+}
+
+model RoomSchedule {
+  id     String @id @default(cuid())
+  roomId String
+  room   Room   @relation(fields: [roomId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  date   DateTime
+
+  createdAt DateTime @default(now())
+}
+
+model CompletionRequest {
+  id            String           @id @default(cuid())
+  applicationId String
+  application   Application      @relation(fields: [applicationId], references: [id])
+  userId        String
+  user          User             @relation(fields: [userId], references: [id])
+  status        CompletionStatus @default(DIAJUKAN)
+  note          String?
+  adminNote     String?
+  submittedAt   DateTime         @default(now())
+  decidedAt     DateTime?
+}
+
+model Letter {
+  id     String     @id @default(cuid())
+  type   LetterType
+  number String     @unique
+  date   DateTime   @default(now())
+
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id])
+
+  pdfPath   String
+  createdAt DateTime @default(now())
+}
+
+model EmailLog {
+  id            String   @id @default(cuid())
+  to            String
+  subject       String
+  body          String
+  type          String
+  status        String   @default("SENT")
+  applicationId String?
+  createdAt     DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id])
+  actorEmail String?
+  action     String
+  entityType String
+  entityId   String?
+  before     String?
+  after      String?
+  createdAt  DateTime @default(now())
+}
