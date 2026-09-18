@@ -8,6 +8,7 @@ const navItems = [
   { href: "/dashboard/jadwal", label: "Jadwal Magang", icon: "📅" },
   { href: "/dashboard/dokumen", label: "Dokumen & Surat", icon: "📄" },
   { href: "/dashboard/selesai", label: "Pengajuan Selesai Magang", icon: "📝" },
+  { href: "/dashboard/akun", label: "Akun Saya", icon: "🔐" },
 ];
 
 export default async function DashboardLayout({

@@ -11,6 +11,7 @@ const navItems = [
   { href: "/admin/surat", label: "Surat", icon: "✉️" },
   { href: "/admin/penyelesaian", label: "Penyelesaian Magang", icon: "📝" },
   { href: "/admin/email-log", label: "Email Log", icon: "📧" },
+  { href: "/admin/pengaturan", label: "Pengaturan", icon: "⚙️" },
   { href: "/admin/audit-log", label: "Audit Log", icon: "🔐" },
 ];
 

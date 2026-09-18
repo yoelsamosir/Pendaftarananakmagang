@@ -41,3 +41,18 @@ export const setupPasswordSchema = z
     message: "Konfirmasi password tidak sama",
     path: ["confirmPassword"],
   });
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Password saat ini wajib diisi"),
+    newPassword: z.string().min(8, "Password baru minimal 8 karakter"),
+    confirmPassword: z.string().min(8),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: "Konfirmasi password tidak sama",
+    path: ["confirmPassword"],
+  });
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(3, "Nama minimal 3 karakter"),
+});
