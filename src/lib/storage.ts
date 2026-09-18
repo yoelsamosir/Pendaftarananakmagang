@@ -1,46 +1,55 @@
-import { promises as fs } from "fs";
-import path from "path";
 import { randomUUID } from "crypto";
+import { createAdminClient } from "./supabase/admin";
 
-// Simpan file di luar /public agar tidak bisa diakses langsung lewat URL publik.
-// Semua akses dokumen wajib melalui route API /api/files/[id] yang memeriksa hak akses.
-const STORAGE_ROOT = path.join(process.cwd(), "storage");
+// Semua dokumen (pengajuan, surat PDF) disimpan di bucket privat Supabase
+// Storage. Akses selalu lewat service role di server — tidak ada URL publik —
+// otorisasi per-file diperiksa di /api/files/[id] sebelum stream dikirim.
+const BUCKET = "documents";
 
 export async function saveUploadedFile(file: File, subDir: string) {
-  const dir = path.join(STORAGE_ROOT, subDir);
-  await fs.mkdir(dir, { recursive: true });
+  const supabase = createAdminClient();
 
-  const ext = path.extname(file.name) || "";
+  const ext = file.name.includes(".") ? file.name.slice(file.name.lastIndexOf(".")) : "";
   const key = `${randomUUID()}${ext}`;
-  const fullPath = path.join(dir, key);
+  const storedPath = `${subDir}/${key}`;
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  await fs.writeFile(fullPath, buffer);
+  const { error } = await supabase.storage.from(BUCKET).upload(storedPath, buffer, {
+    contentType: file.type || "application/octet-stream",
+    upsert: false,
+  });
+  if (error) throw new Error(`Gagal mengunggah dokumen: ${error.message}`);
 
   return {
-    storedPath: path.join(subDir, key).replace(/\\/g, "/"),
+    storedPath,
     fileName: file.name,
     mimeType: file.type || "application/octet-stream",
     size: buffer.length,
   };
 }
 
-export async function saveGeneratedFile(
-  buffer: Buffer,
-  subDir: string,
-  fileName: string
-) {
-  const dir = path.join(STORAGE_ROOT, subDir);
-  await fs.mkdir(dir, { recursive: true });
+export async function saveGeneratedFile(buffer: Buffer, subDir: string, fileName: string) {
+  const supabase = createAdminClient();
+
   const key = `${randomUUID()}-${fileName}`;
-  const fullPath = path.join(dir, key);
-  await fs.writeFile(fullPath, buffer);
-  return path.join(subDir, key).replace(/\\/g, "/");
+  const storedPath = `${subDir}/${key}`;
+
+  const { error } = await supabase.storage.from(BUCKET).upload(storedPath, buffer, {
+    contentType: "application/pdf",
+    upsert: false,
+  });
+  if (error) throw new Error(`Gagal menyimpan surat: ${error.message}`);
+
+  return storedPath;
 }
 
 export async function readStoredFile(storedPath: string) {
-  const fullPath = path.join(STORAGE_ROOT, storedPath);
-  return fs.readFile(fullPath);
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase.storage.from(BUCKET).download(storedPath);
+  if (error || !data) throw new Error(`Gagal membaca dokumen: ${error?.message}`);
+
+  return Buffer.from(await data.arrayBuffer());
 }
 
 export const ALLOWED_DOC_TYPES = [

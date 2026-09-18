@@ -1,28 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { hashPassword } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import { setupPasswordSchema } from "@/lib/validation";
 import { writeAuditLog } from "@/lib/audit";
 
-export async function GET(req: NextRequest) {
-  const token = req.nextUrl.searchParams.get("token");
-  if (!token) {
-    return NextResponse.json({ error: "Token tidak valid" }, { status: 400 });
-  }
-  const user = await prisma.user.findUnique({ where: { setupToken: token } });
-  if (
-    !user ||
-    !user.setupTokenExpires ||
-    user.setupTokenExpires.getTime() < Date.now()
-  ) {
-    return NextResponse.json(
-      { error: "Tautan sudah kedaluwarsa atau tidak valid" },
-      { status: 400 }
-    );
-  }
-  return NextResponse.json({ email: user.email, name: user.name });
-}
-
+// Token di sini adalah `hashed_token` dari Supabase Auth (link recovery yang
+// digenerate saat pengajuan diterima) — sekali pakai. verifyOtp memvalidasi
+// token sekaligus membuat sesi baru, lalu updateUser mengganti password.
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const parsed = setupPasswordSchema.safeParse(body);
@@ -34,31 +17,37 @@ export async function POST(req: NextRequest) {
   }
   const { token, password } = parsed.data;
 
-  const user = await prisma.user.findUnique({ where: { setupToken: token } });
-  if (
-    !user ||
-    !user.setupTokenExpires ||
-    user.setupTokenExpires.getTime() < Date.now()
-  ) {
+  const supabase = await createClient();
+
+  const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
+    token_hash: token,
+    type: "recovery",
+  });
+
+  if (verifyError || !verifyData.user) {
     return NextResponse.json(
       { error: "Tautan sudah kedaluwarsa atau tidak valid" },
       { status: 400 }
     );
   }
 
-  const passwordHash = await hashPassword(password);
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { passwordHash, setupToken: null, setupTokenExpires: null },
-  });
+  const { error: updateError } = await supabase.auth.updateUser({ password });
+  if (updateError) {
+    return NextResponse.json(
+      { error: "Gagal menyimpan password, silakan coba lagi" },
+      { status: 400 }
+    );
+  }
 
   await writeAuditLog({
-    actorId: user.id,
-    actorEmail: user.email,
+    actorId: verifyData.user.id,
+    actorEmail: verifyData.user.email,
     action: "SETUP_PASSWORD",
     entityType: "User",
-    entityId: user.id,
+    entityId: verifyData.user.id,
   });
 
-  return NextResponse.json({ ok: true });
+  const role = (verifyData.user.user_metadata?.role as string) || "PESERTA";
+
+  return NextResponse.json({ ok: true, role });
 }

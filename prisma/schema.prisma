@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -40,16 +41,16 @@ enum LetterType {
   SELESAI
 }
 
+// Profil aplikasi untuk pengguna Supabase Auth. `id` sama persis dengan
+// auth.users.id (dikelola Supabase Auth, bukan Prisma) — password, undangan,
+// dan reset password ditangani sepenuhnya oleh Supabase Auth.
 model User {
-  id                String   @id @default(cuid())
-  email             String   @unique
-  passwordHash      String?
-  role              Role     @default(PESERTA)
-  name              String
-  isActive          Boolean  @default(true)
-  setupToken        String?  @unique
-  setupTokenExpires DateTime?
-  createdAt         DateTime @default(now())
+  id        String   @id @db.Uuid
+  email     String   @unique
+  role      Role     @default(PESERTA)
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
 
   application   Application? @relation("UserApplication")
   applicationId String?      @unique
@@ -109,7 +110,7 @@ model Application {
   letters            Letter[]
 
   user   User?   @relation("UserApplication", fields: [userId], references: [id])
-  userId String? @unique
+  userId String? @unique @db.Uuid
 }
 
 model Document {
@@ -124,7 +125,7 @@ model Document {
   applicationId String?
   application   Application? @relation(fields: [applicationId], references: [id])
 
-  uploadedById String?
+  uploadedById String? @db.Uuid
   uploadedBy   User?   @relation("UploadedByUser", fields: [uploadedById], references: [id])
 
   createdAt DateTime @default(now())
@@ -140,7 +141,7 @@ model RoomSchedule {
   id     String @id @default(cuid())
   roomId String
   room   Room   @relation(fields: [roomId], references: [id])
-  userId String
+  userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
   date   DateTime
 
@@ -151,7 +152,7 @@ model CompletionRequest {
   id            String           @id @default(cuid())
   applicationId String
   application   Application      @relation(fields: [applicationId], references: [id])
-  userId        String
+  userId        String           @db.Uuid
   user          User             @relation(fields: [userId], references: [id])
   status        CompletionStatus @default(DIAJUKAN)
   note          String?
@@ -168,7 +169,7 @@ model Letter {
 
   applicationId String
   application   Application @relation(fields: [applicationId], references: [id])
-  userId        String?
+  userId        String?     @db.Uuid
   user          User?       @relation(fields: [userId], references: [id])
 
   pdfPath   String
@@ -188,7 +189,7 @@ model EmailLog {
 
 model AuditLog {
   id         String   @id @default(cuid())
-  actorId    String?
+  actorId    String?  @db.Uuid
   actor      User?    @relation(fields: [actorId], references: [id])
   actorEmail String?
   action     String

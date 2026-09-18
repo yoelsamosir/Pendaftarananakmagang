@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { verifyPassword, setSessionCookie } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import { loginSchema } from "@/lib/validation";
 import { writeAuditLog } from "@/lib/audit";
 
@@ -12,36 +11,22 @@ export async function POST(req: NextRequest) {
   }
   const { email, password } = parsed.data;
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !user.passwordHash || !user.isActive) {
-    return NextResponse.json(
-      { error: "Email atau password salah" },
-      { status: 401 }
-    );
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error || !data.user) {
+    return NextResponse.json({ error: "Email atau password salah" }, { status: 401 });
   }
 
-  const valid = await verifyPassword(password, user.passwordHash);
-  if (!valid) {
-    return NextResponse.json(
-      { error: "Email atau password salah" },
-      { status: 401 }
-    );
-  }
-
-  await setSessionCookie({
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-    name: user.name,
-  });
+  const role = (data.user.user_metadata?.role as string) || "PESERTA";
 
   await writeAuditLog({
-    actorId: user.id,
-    actorEmail: user.email,
+    actorId: data.user.id,
+    actorEmail: data.user.email ?? email,
     action: "LOGIN",
     entityType: "User",
-    entityId: user.id,
+    entityId: data.user.id,
   });
 
-  return NextResponse.json({ role: user.role });
+  return NextResponse.json({ role });
 }

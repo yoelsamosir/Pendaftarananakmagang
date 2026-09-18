@@ -1,34 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifySessionToken, SESSION_COOKIE } from "@/lib/auth";
+import { updateSupabaseSession } from "@/lib/supabase/middleware";
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // Selalu refresh sesi Supabase Auth dulu agar token tetap valid di seluruh situs.
+  const { supabaseResponse, user } = await updateSupabaseSession(req);
+
   const isPesertaArea = pathname.startsWith("/dashboard");
   const isAdminArea = pathname.startsWith("/admin");
 
-  if (!isPesertaArea && !isAdminArea) return NextResponse.next();
+  if (!isPesertaArea && !isAdminArea) return supabaseResponse;
 
-  const token = req.cookies.get(SESSION_COOKIE)?.value;
-  const session = token ? await verifySessionToken(token) : null;
-
-  if (!session) {
+  if (!user) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAdminArea && session.role !== "ADMIN") {
+  const role = (user.user_metadata?.role as string) || "PESERTA";
+
+  if (isAdminArea && role !== "ADMIN") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  if (isPesertaArea && session.role !== "PESERTA") {
+  if (isPesertaArea && role !== "PESERTA") {
     return NextResponse.redirect(new URL("/admin", req.url));
   }
 
-  return NextResponse.next();
+  return supabaseResponse;
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

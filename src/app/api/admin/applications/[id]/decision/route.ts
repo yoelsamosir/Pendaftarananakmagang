@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
-import { hashPassword } from "@/lib/auth";
+import { createAdminClient, findAuthUserByEmail } from "@/lib/supabase/admin";
 import { generateNomorSurat } from "@/lib/nomor";
 import { generateSuratPenerimaanPdf } from "@/lib/pdf";
 import { saveGeneratedFile } from "@/lib/storage";
@@ -107,39 +107,65 @@ export async function POST(
   }
 
   // TERIMA
-  const existingUser = await prisma.user.findUnique({
+  const existingProfile = await prisma.user.findUnique({
     where: { email: application.email },
   });
-  if (existingUser && existingUser.applicationId && existingUser.applicationId !== id) {
+  if (existingProfile && existingProfile.applicationId && existingProfile.applicationId !== id) {
     return NextResponse.json(
       { error: "Email ini sudah terdaftar pada akun peserta lain" },
       { status: 409 }
     );
   }
 
-  const setupToken = randomBytes(32).toString("hex");
-  const setupTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 72); // 72 jam
+  const supabaseAdmin = createAdminClient();
 
-  const user = existingUser
+  let authUserId = existingProfile?.id;
+  if (!authUserId) {
+    const existingAuthUser = await findAuthUserByEmail(supabaseAdmin, application.email);
+    if (existingAuthUser) {
+      authUserId = existingAuthUser.id;
+    } else {
+      const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email: application.email,
+        password: randomBytes(24).toString("hex"),
+        email_confirm: true,
+        user_metadata: { name: application.namaLengkap, role: "PESERTA" },
+      });
+      if (createError || !created.user) {
+        return NextResponse.json(
+          { error: `Gagal membuat akun peserta: ${createError?.message}` },
+          { status: 500 }
+        );
+      }
+      authUserId = created.user.id;
+    }
+  }
+
+  // Link recovery Supabase Auth dipakai sebagai token setup password sekali pakai.
+  const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+    type: "recovery",
+    email: application.email,
+  });
+  if (linkError || !linkData.properties?.hashed_token) {
+    return NextResponse.json(
+      { error: `Gagal membuat tautan setup password: ${linkError?.message}` },
+      { status: 500 }
+    );
+  }
+  const setupToken = linkData.properties.hashed_token;
+
+  const user = existingProfile
     ? await prisma.user.update({
-        where: { id: existingUser.id },
-        data: {
-          applicationId: id,
-          name: application.namaLengkap,
-          setupToken,
-          setupTokenExpires,
-          isActive: true,
-        },
+        where: { id: existingProfile.id },
+        data: { applicationId: id, name: application.namaLengkap, isActive: true },
       })
     : await prisma.user.create({
         data: {
+          id: authUserId,
           email: application.email,
           name: application.namaLengkap,
           role: "PESERTA",
           applicationId: id,
-          setupToken,
-          setupTokenExpires,
-          passwordHash: await hashPassword(randomBytes(16).toString("hex")),
         },
       });
 
