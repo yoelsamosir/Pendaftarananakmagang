@@ -22,12 +22,13 @@ export default async function AdminPesertaPage() {
               <th className="px-4 py-3 font-medium">Divisi</th>
               <th className="px-4 py-3 font-medium">Periode</th>
               <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium">Akun</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {participants.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
                   Belum ada peserta.
                 </td>
               </tr>
@@ -55,6 +56,17 @@ export default async function AdminPesertaPage() {
                 </td>
                 <td className="px-4 py-3">
                   {p.application && <ApplicationStatusBadge status={p.application.status} />}
+                </td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      p.isActive
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {p.isActive ? "Aktif" : "Nonaktif"}
+                  </span>
                 </td>
               </tr>
             ))}

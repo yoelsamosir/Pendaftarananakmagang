@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ApplicationStatusBadge } from "@/components/StatusBadge";
@@ -12,7 +13,7 @@ export default async function AdminPengajuanDetailPage({
   const { id } = await params;
   const application = await prisma.application.findUnique({
     where: { id },
-    include: { divisi: true, documents: true, letters: true },
+    include: { divisi: true, documents: true, letters: true, user: true },
   });
 
   if (!application) notFound();
@@ -70,6 +71,30 @@ export default async function AdminPengajuanDetailPage({
                 {application.catatan || "-"}
               </p>
             </Section>
+            {application.user && (
+              <Section title="Akun Peserta">
+                <p className="text-sm text-slate-700">
+                  <span className="text-slate-400">Email login: </span>
+                  {application.user.email}
+                </p>
+                <p className="text-sm text-slate-700">
+                  <span className="text-slate-400">Status: </span>
+                  <span
+                    className={
+                      application.user.isActive ? "text-emerald-600" : "text-red-600"
+                    }
+                  >
+                    {application.user.isActive ? "Aktif" : "Nonaktif"}
+                  </span>
+                </p>
+                <Link
+                  href={`/admin/peserta/${application.user.id}`}
+                  className="text-sm font-medium text-blue-700 hover:underline"
+                >
+                  Kelola Akun →
+                </Link>
+              </Section>
+            )}
           </div>
 
           {application.status === "DITOLAK" && application.alasanTolak && (

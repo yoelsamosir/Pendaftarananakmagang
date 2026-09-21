@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ApplicationStatusBadge, CompletionStatusBadge } from "@/components/StatusBadge";
 import { DOCUMENT_TYPE_LABEL } from "@/lib/constants";
+import AccountPanel from "./AccountPanel";
 
 export default async function AdminPesertaDetailPage({
   params,
@@ -40,6 +41,12 @@ export default async function AdminPesertaDetailPage({
           </p>
         </div>
       </div>
+
+      <AccountPanel
+        participantId={participant.id}
+        email={participant.email}
+        isActive={participant.isActive}
+      />
 
       <div className="rounded-lg border border-slate-200 bg-white p-5">
         <h2 className="text-sm font-semibold text-slate-900">Jadwal Ruangan</h2>
