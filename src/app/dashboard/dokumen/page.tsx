@@ -24,25 +24,25 @@ export default async function DokumenPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-slate-900">Dokumen & Surat</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <h1 className="text-xl font-serif font-bold text-stone-900">Dokumen & Surat</h1>
+      <p className="mt-1 text-sm text-stone-500">
         Pusat dokumen Anda. Surat resmi diterbitkan otomatis oleh sistem.
       </p>
 
       <div className="mt-6 space-y-3">
         {documents.length === 0 && (
-          <p className="text-sm text-slate-400">Belum ada dokumen.</p>
+          <p className="text-sm text-stone-400">Belum ada dokumen.</p>
         )}
         {documents.map((d) => (
           <div
             key={d.id}
-            className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4"
+            className="flex items-center justify-between rounded-lg border border-stone-200 bg-white p-4"
           >
             <div>
-              <p className="text-sm font-medium text-slate-800">
+              <p className="text-sm font-medium text-stone-800">
                 {DOCUMENT_TYPE_LABEL[d.type] ?? d.fileName}
               </p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-stone-400">
                 {CATEGORY_LABEL[d.category] ?? d.category} ·{" "}
                 {d.createdAt.toLocaleDateString("id-ID")}
               </p>
@@ -51,7 +51,7 @@ export default async function DokumenPage() {
               href={`/api/files/${d.id}`}
               target="_blank"
               rel="noreferrer"
-              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
             >
               Lihat / Download
             </a>

@@ -16,11 +16,11 @@ export default async function AdminDokumenPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-slate-900">Dokumen</h1>
+      <h1 className="text-xl font-serif font-bold text-stone-900">Dokumen</h1>
 
-      <div className="mt-6 overflow-x-auto rounded-lg border border-slate-200 bg-white">
+      <div className="mt-6 overflow-x-auto rounded-lg border border-stone-200 bg-white">
         <table className="w-full min-w-[760px] text-sm">
-          <thead className="bg-slate-50 text-left text-slate-500">
+          <thead className="bg-stone-50 text-left text-stone-500">
             <tr>
               <th className="px-4 py-3 font-medium">Peserta</th>
               <th className="px-4 py-3 font-medium">Kategori</th>
@@ -29,26 +29,26 @@ export default async function AdminDokumenPage() {
               <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-stone-100">
             {documents.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={5} className="px-4 py-8 text-center text-stone-400">
                   Belum ada dokumen.
                 </td>
               </tr>
             )}
             {documents.map((d) => (
-              <tr key={d.id} className="hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-800">
+              <tr key={d.id} className="hover:bg-stone-50">
+                <td className="px-4 py-3 text-stone-800">
                   {d.application?.namaLengkap || "-"}
                 </td>
-                <td className="px-4 py-3 text-slate-600">
+                <td className="px-4 py-3 text-stone-600">
                   {CATEGORY_LABEL[d.category] ?? d.category}
                 </td>
-                <td className="px-4 py-3 text-slate-600">
+                <td className="px-4 py-3 text-stone-600">
                   {DOCUMENT_TYPE_LABEL[d.type] ?? d.type}
                 </td>
-                <td className="px-4 py-3 text-slate-500">
+                <td className="px-4 py-3 text-stone-500">
                   {d.createdAt.toLocaleDateString("id-ID")}
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -56,7 +56,7 @@ export default async function AdminDokumenPage() {
                     href={`/api/files/${d.id}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-medium text-blue-700 hover:underline"
+                    className="font-medium text-emerald-800 hover:underline"
                   >
                     Lihat
                   </a>

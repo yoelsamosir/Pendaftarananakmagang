@@ -25,13 +25,13 @@ export default async function AdminPesertaDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="rounded-lg border border-stone-200 bg-white p-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-slate-900">{participant.name}</h1>
+          <h1 className="text-xl font-serif font-bold text-stone-900">{participant.name}</h1>
           <ApplicationStatusBadge status={app.status} />
         </div>
-        <p className="text-sm text-slate-500">{participant.email}</p>
-        <div className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+        <p className="text-sm text-stone-500">{participant.email}</p>
+        <div className="mt-4 grid gap-2 text-sm text-stone-700 sm:grid-cols-2">
           <p>Institusi: {app.institusi}</p>
           <p>Program Studi: {app.programStudi || "-"}</p>
           <p>Divisi: {app.divisi?.name || "-"}</p>
@@ -48,11 +48,11 @@ export default async function AdminPesertaDetailPage({
         isActive={participant.isActive}
       />
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5">
-        <h2 className="text-sm font-semibold text-slate-900">Jadwal Ruangan</h2>
-        <ul className="mt-3 divide-y divide-slate-100">
+      <div className="rounded-lg border border-stone-200 bg-white p-5">
+        <h2 className="text-sm font-semibold text-stone-900">Jadwal Ruangan</h2>
+        <ul className="mt-3 divide-y divide-stone-100">
           {participant.roomSchedules.length === 0 && (
-            <li className="py-3 text-sm text-slate-400">Belum ada jadwal.</li>
+            <li className="py-3 text-sm text-stone-400">Belum ada jadwal.</li>
           )}
           {participant.roomSchedules.map((s) => (
             <li key={s.id} className="flex justify-between py-2 text-sm">
@@ -63,9 +63,9 @@ export default async function AdminPesertaDetailPage({
         </ul>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5">
-        <h2 className="text-sm font-semibold text-slate-900">Dokumen & Surat</h2>
-        <ul className="mt-3 divide-y divide-slate-100">
+      <div className="rounded-lg border border-stone-200 bg-white p-5">
+        <h2 className="text-sm font-semibold text-stone-900">Dokumen & Surat</h2>
+        <ul className="mt-3 divide-y divide-stone-100">
           {app.documents.map((doc) => (
             <li key={doc.id} className="flex items-center justify-between py-3 text-sm">
               <span>{DOCUMENT_TYPE_LABEL[doc.type] ?? doc.type}</span>
@@ -73,21 +73,21 @@ export default async function AdminPesertaDetailPage({
                 href={`/api/files/${doc.id}`}
                 target="_blank"
                 rel="noreferrer"
-                className="font-medium text-blue-700 hover:underline"
+                className="font-medium text-emerald-800 hover:underline"
               >
                 Lihat
               </a>
             </li>
           ))}
           {app.documents.length === 0 && (
-            <li className="py-3 text-sm text-slate-400">Belum ada dokumen.</li>
+            <li className="py-3 text-sm text-stone-400">Belum ada dokumen.</li>
           )}
         </ul>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5">
-        <h2 className="text-sm font-semibold text-slate-900">Pengajuan Selesai Magang</h2>
-        <ul className="mt-3 divide-y divide-slate-100">
+      <div className="rounded-lg border border-stone-200 bg-white p-5">
+        <h2 className="text-sm font-semibold text-stone-900">Pengajuan Selesai Magang</h2>
+        <ul className="mt-3 divide-y divide-stone-100">
           {app.completionRequests.map((c) => (
             <li key={c.id} className="flex items-center justify-between py-2 text-sm">
               <span>{c.submittedAt.toLocaleDateString("id-ID")}</span>
@@ -95,7 +95,7 @@ export default async function AdminPesertaDetailPage({
             </li>
           ))}
           {app.completionRequests.length === 0 && (
-            <li className="py-3 text-sm text-slate-400">Belum ada pengajuan selesai.</li>
+            <li className="py-3 text-sm text-stone-400">Belum ada pengajuan selesai.</li>
           )}
         </ul>
       </div>

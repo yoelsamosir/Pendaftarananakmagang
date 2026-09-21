@@ -17,7 +17,7 @@ export const APPLICATION_STATUS_COLOR: Record<string, string> = {
   PERLU_PERBAIKAN: "bg-orange-100 text-orange-700",
   DITERIMA: "bg-emerald-100 text-emerald-700",
   DITOLAK: "bg-red-100 text-red-700",
-  DIBATALKAN: "bg-slate-200 text-slate-600",
+  DIBATALKAN: "bg-stone-200 text-stone-600",
 };
 
 export const COMPLETION_STATUS_LABEL: Record<string, string> = {

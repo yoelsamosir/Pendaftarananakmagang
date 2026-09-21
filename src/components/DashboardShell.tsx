@@ -15,13 +15,13 @@ export default function DashboardShell({
   userName: string;
 }) {
   return (
-    <div className="flex min-h-screen bg-slate-100">
-      <aside className="hidden w-64 shrink-0 flex-col bg-slate-900 text-slate-100 md:flex">
-        <div className="flex items-center gap-2 border-b border-slate-800 px-5 py-5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm font-bold">
+    <div className="flex min-h-screen bg-stone-100">
+      <aside className="hidden w-64 shrink-0 flex-col bg-emerald-950 text-stone-100 md:flex">
+        <div className="flex items-center gap-2 border-b border-emerald-900 px-5 py-5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-400/40 bg-emerald-900 text-sm font-serif font-bold text-amber-300">
             BLP
           </span>
-          <span className="text-sm font-semibold leading-tight">
+          <span className="font-serif text-sm font-semibold leading-tight text-stone-50">
             {title}
           </span>
         </div>
@@ -30,15 +30,15 @@ export default function DashboardShell({
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white"
+              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-stone-300 hover:bg-emerald-900 hover:text-amber-200"
             >
               <span>{item.icon}</span>
               <span>{item.label}</span>
             </Link>
           ))}
         </nav>
-        <div className="border-t border-slate-800 px-3 py-4">
-          <p className="mb-2 truncate px-3 text-xs text-slate-400">
+        <div className="border-t border-emerald-900 px-3 py-4">
+          <p className="mb-2 truncate px-3 text-xs text-stone-400">
             {userName}
           </p>
           <LogoutButton />
@@ -46,8 +46,8 @@ export default function DashboardShell({
       </aside>
 
       <div className="flex min-h-screen flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
-          <span className="text-sm font-semibold">{title}</span>
+        <header className="flex items-center justify-between border-b border-stone-200 bg-white px-4 py-3 md:hidden">
+          <span className="font-serif text-sm font-semibold">{title}</span>
           <LogoutButton />
         </header>
         <main className="flex-1 p-4 sm:p-6">{children}</main>

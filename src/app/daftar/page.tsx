@@ -51,29 +51,29 @@ export default function DaftarPage() {
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-3xl text-emerald-600">
             ✓
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-serif font-bold text-stone-900">
             Pengajuan Berhasil Dikirim
           </h1>
-          <p className="mt-3 text-slate-600">
+          <p className="mt-3 text-stone-600">
             Nomor pengajuan Anda adalah
           </p>
-          <p className="mt-1 text-2xl font-mono font-bold text-blue-700">
+          <p className="mt-1 text-2xl font-mono font-bold text-emerald-800">
             {result.nomorPengajuan}
           </p>
-          <p className="mt-3 max-w-md text-sm text-slate-500">
+          <p className="mt-3 max-w-md text-sm text-stone-500">
             Simpan nomor ini untuk memeriksa status pengajuan Anda. Notifikasi
             juga akan dikirim ke email yang Anda daftarkan.
           </p>
           <div className="mt-8 flex gap-3">
             <Link
               href="/status"
-              className="rounded-md bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-800"
+              className="rounded-md bg-emerald-800 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900"
             >
               Cek Status Pengajuan
             </Link>
             <Link
               href="/"
-              className="rounded-md border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="rounded-md border border-stone-300 px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50"
             >
               Kembali ke Beranda
             </Link>
@@ -87,10 +87,10 @@ export default function DaftarPage() {
     <div className="flex min-h-full flex-col">
       <PublicNavbar />
       <div className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6">
-        <h1 className="text-2xl font-bold text-slate-900">
+        <h1 className="text-2xl font-serif font-bold text-stone-900">
           Formulir Pendaftaran Magang
         </h1>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-stone-600">
           Anda tidak perlu membuat akun untuk mengajukan magang. Akun akan
           dibuatkan sistem apabila pengajuan Anda diterima.
         </p>
@@ -103,7 +103,7 @@ export default function DaftarPage() {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-10">
           <fieldset className="space-y-4">
-            <legend className="text-base font-semibold text-slate-900">
+            <legend className="text-base font-semibold text-stone-900">
               1. Data Pribadi
             </legend>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -116,7 +116,7 @@ export default function DaftarPage() {
           </fieldset>
 
           <fieldset className="space-y-4">
-            <legend className="text-base font-semibold text-slate-900">
+            <legend className="text-base font-semibold text-stone-900">
               2. Data Pendidikan
             </legend>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -133,18 +133,18 @@ export default function DaftarPage() {
           </fieldset>
 
           <fieldset className="space-y-4">
-            <legend className="text-base font-semibold text-slate-900">
+            <legend className="text-base font-semibold text-stone-900">
               3. Data Magang
             </legend>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Jenis / Kategori Magang" name="jenisMagang" />
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
+                <label className="mb-1 block text-sm font-medium text-stone-700">
                   Divisi / Bagian (jika sudah diketahui)
                 </label>
                 <select
                   name="divisiId"
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
                 >
                   <option value="">Belum ditentukan</option>
                   {divisions.map((d) => (
@@ -172,7 +172,7 @@ export default function DaftarPage() {
           </fieldset>
 
           <fieldset className="space-y-4">
-            <legend className="text-base font-semibold text-slate-900">
+            <legend className="text-base font-semibold text-stone-900">
               4. Dokumen
             </legend>
             <FileField
@@ -189,7 +189,7 @@ export default function DaftarPage() {
               label="Pedoman Magang dari Kampus/Sekolah/Instansi (opsional)"
               name="dokumen_pedoman"
             />
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-stone-500">
               Format PDF atau Word, maksimal 5MB per dokumen.
             </p>
           </fieldset>
@@ -197,7 +197,7 @@ export default function DaftarPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-md bg-blue-700 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
+            className="w-full rounded-md bg-emerald-800 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-900 disabled:opacity-60"
           >
             {submitting ? "Mengirim..." : "Kirim Pengajuan"}
           </button>
@@ -224,7 +224,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium text-slate-700">
+      <label className="mb-1 block text-sm font-medium text-stone-700">
         {label}
         {required && <span className="text-red-500"> *</span>}
       </label>
@@ -234,7 +234,7 @@ function Field({
           required={required}
           placeholder={placeholder}
           rows={3}
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
         />
       ) : (
         <input
@@ -242,7 +242,7 @@ function Field({
           name={name}
           required={required}
           placeholder={placeholder}
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
         />
       )}
     </div>
@@ -260,7 +260,7 @@ function FileField({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium text-slate-700">
+      <label className="mb-1 block text-sm font-medium text-stone-700">
         {label}
         {required && <span className="text-red-500"> *</span>}
       </label>
@@ -269,7 +269,7 @@ function FileField({
         name={name}
         required={required}
         accept=".pdf,.doc,.docx"
-        className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+        className="block w-full text-sm text-stone-600 file:mr-4 file:rounded-md file:border-0 file:bg-emerald-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-emerald-800 hover:file:bg-emerald-100"
       />
     </div>
   );

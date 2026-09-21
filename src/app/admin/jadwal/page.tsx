@@ -88,7 +88,7 @@ export default function AdminJadwalPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-slate-900">Jadwal / Ruangan</h1>
+      <h1 className="text-xl font-serif font-bold text-stone-900">Jadwal / Ruangan</h1>
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -97,21 +97,21 @@ export default function AdminJadwalPage() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <h2 className="text-sm font-semibold text-slate-900">Daftar Ruangan</h2>
+        <div className="rounded-lg border border-stone-200 bg-white p-5">
+          <h2 className="text-sm font-semibold text-stone-900">Daftar Ruangan</h2>
           <form onSubmit={handleAddRoom} className="mt-3 flex gap-2">
             <input
               value={newRoomName}
               onChange={(e) => setNewRoomName(e.target.value)}
               placeholder="Nama ruangan baru"
               required
-              className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="flex-1 rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
             />
-            <button className="rounded-md bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
+            <button className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-900">
               Tambah
             </button>
           </form>
-          <ul className="mt-4 divide-y divide-slate-100">
+          <ul className="mt-4 divide-y divide-stone-100">
             {rooms.map((r) => (
               <li key={r.id} className="flex items-center justify-between py-2 text-sm">
                 <span>{r.name}</span>
@@ -124,18 +124,18 @@ export default function AdminJadwalPage() {
               </li>
             ))}
             {rooms.length === 0 && (
-              <li className="py-3 text-sm text-slate-400">Belum ada ruangan.</li>
+              <li className="py-3 text-sm text-stone-400">Belum ada ruangan.</li>
             )}
           </ul>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <h2 className="text-sm font-semibold text-slate-900">Tambah Jadwal Penempatan</h2>
+        <div className="rounded-lg border border-stone-200 bg-white p-5">
+          <h2 className="text-sm font-semibold text-stone-900">Tambah Jadwal Penempatan</h2>
           <form onSubmit={handleAddSchedule} className="mt-3 space-y-3">
             <select
               name="userId"
               required
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
             >
               <option value="">Pilih peserta</option>
               {participants.map((p) => (
@@ -147,7 +147,7 @@ export default function AdminJadwalPage() {
             <select
               name="roomId"
               required
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
             >
               <option value="">Pilih ruangan</option>
               {rooms.map((r) => (
@@ -160,20 +160,20 @@ export default function AdminJadwalPage() {
               type="date"
               name="date"
               required
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
             />
-            <button className="w-full rounded-md bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
+            <button className="w-full rounded-md bg-emerald-800 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-900">
               Tambah Jadwal
             </button>
           </form>
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5">
-        <h2 className="text-sm font-semibold text-slate-900">Semua Jadwal</h2>
+      <div className="rounded-lg border border-stone-200 bg-white p-5">
+        <h2 className="text-sm font-semibold text-stone-900">Semua Jadwal</h2>
         <div className="mt-3 overflow-x-auto">
           <table className="w-full min-w-[560px] text-sm">
-            <thead className="bg-slate-50 text-left text-slate-500">
+            <thead className="bg-stone-50 text-left text-stone-500">
               <tr>
                 <th className="px-3 py-2 font-medium">Tanggal</th>
                 <th className="px-3 py-2 font-medium">Peserta</th>
@@ -181,7 +181,7 @@ export default function AdminJadwalPage() {
                 <th className="px-3 py-2 font-medium"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-stone-100">
               {schedules.map((s) => (
                 <tr key={s.id}>
                   <td className="px-3 py-2">
@@ -206,7 +206,7 @@ export default function AdminJadwalPage() {
               ))}
               {schedules.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-3 py-6 text-center text-slate-400">
+                  <td colSpan={4} className="px-3 py-6 text-center text-stone-400">
                     Belum ada jadwal.
                   </td>
                 </tr>

@@ -47,40 +47,40 @@ export default function StatusPage() {
     <div className="flex min-h-full flex-col">
       <PublicNavbar />
       <div className="mx-auto w-full max-w-xl px-4 py-14 sm:px-6">
-        <h1 className="text-2xl font-bold text-slate-900">
+        <h1 className="text-2xl font-serif font-bold text-stone-900">
           Cek Status Pengajuan
         </h1>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-stone-600">
           Masukkan nomor pengajuan dan email yang Anda gunakan saat mendaftar.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
+            <label className="mb-1 block text-sm font-medium text-stone-700">
               Nomor Pengajuan
             </label>
             <input
               name="nomor"
               required
               placeholder="MAG-2026-0001"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
+            <label className="mb-1 block text-sm font-medium text-stone-700">
               Email
             </label>
             <input
               name="email"
               type="email"
               required
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-blue-700 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
+            className="w-full rounded-md bg-emerald-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900 disabled:opacity-60"
           >
             {loading ? "Memeriksa..." : "Cek Status"}
           </button>
@@ -93,18 +93,18 @@ export default function StatusPage() {
         )}
 
         {data && (
-          <div className="mt-8 rounded-lg border border-slate-200 bg-white p-5">
+          <div className="mt-8 rounded-lg border border-stone-200 bg-white p-5">
             <div className="flex items-center justify-between">
-              <p className="font-mono text-sm text-slate-500">
+              <p className="font-mono text-sm text-stone-500">
                 {data.nomorPengajuan}
               </p>
               <ApplicationStatusBadge status={data.status} />
             </div>
-            <p className="mt-3 text-lg font-semibold text-slate-900">
+            <p className="mt-3 text-lg font-semibold text-stone-900">
               {data.namaLengkap}
             </p>
-            <p className="text-sm text-slate-600">{data.institusi}</p>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="text-sm text-stone-600">{data.institusi}</p>
+            <p className="mt-2 text-sm text-stone-500">
               Periode rencana: {new Date(data.rencanaMulai).toLocaleDateString("id-ID")}{" "}
               s.d. {new Date(data.rencanaSelesai).toLocaleDateString("id-ID")}
             </p>

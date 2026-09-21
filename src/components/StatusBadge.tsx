@@ -9,7 +9,7 @@ export function ApplicationStatusBadge({ status }: { status: string }) {
   return (
     <span
       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-        APPLICATION_STATUS_COLOR[status] ?? "bg-slate-100 text-slate-700"
+        APPLICATION_STATUS_COLOR[status] ?? "bg-stone-100 text-stone-700"
       }`}
     >
       {APPLICATION_STATUS_LABEL[status] ?? status}
@@ -21,7 +21,7 @@ export function CompletionStatusBadge({ status }: { status: string }) {
   return (
     <span
       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-        COMPLETION_STATUS_COLOR[status] ?? "bg-slate-100 text-slate-700"
+        COMPLETION_STATUS_COLOR[status] ?? "bg-stone-100 text-stone-700"
       }`}
     >
       {COMPLETION_STATUS_LABEL[status] ?? status}

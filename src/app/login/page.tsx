@@ -44,8 +44,8 @@ function LoginForm() {
 
   return (
     <div className="mx-auto w-full max-w-sm px-4 py-16 sm:px-6">
-      <h1 className="text-2xl font-bold text-slate-900">Masuk</h1>
-      <p className="mt-2 text-sm text-slate-600">
+      <h1 className="text-2xl font-serif font-bold text-stone-900">Masuk</h1>
+      <p className="mt-2 text-sm text-stone-600">
         Untuk peserta yang sudah diterima dan admin sistem.
       </p>
 
@@ -57,39 +57,39 @@ function LoginForm() {
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
+          <label className="mb-1 block text-sm font-medium text-stone-700">
             Email
           </label>
           <input
             name="email"
             type="email"
             required
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
+          <label className="mb-1 block text-sm font-medium text-stone-700">
             Password
           </label>
           <input
             name="password"
             type="password"
             required
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-blue-700 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
+          className="w-full rounded-md bg-emerald-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900 disabled:opacity-60"
         >
           {loading ? "Memproses..." : "Masuk"}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-stone-500">
         Belum pernah mendaftar?{" "}
-        <Link href="/daftar" className="font-medium text-blue-700">
+        <Link href="/daftar" className="font-medium text-emerald-800">
           Ajukan magang
         </Link>
       </p>

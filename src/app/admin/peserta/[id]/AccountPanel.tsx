@@ -63,13 +63,13 @@ export default function AccountPanel({
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5">
-      <h2 className="text-sm font-semibold text-slate-900">Kelola Akun Peserta</h2>
+    <div className="rounded-lg border border-stone-200 bg-white p-5">
+      <h2 className="text-sm font-semibold text-stone-900">Kelola Akun Peserta</h2>
 
       <div className="mt-3 flex items-center justify-between">
         <div>
-          <p className="text-sm text-slate-700">{email}</p>
-          <p className="text-xs text-slate-400">Email login peserta</p>
+          <p className="text-sm text-stone-700">{email}</p>
+          <p className="text-xs text-stone-400">Email login peserta</p>
         </div>
         <span
           className={`rounded-full px-3 py-1 text-xs font-medium ${
@@ -99,24 +99,24 @@ export default function AccountPanel({
         <button
           onClick={generateLink}
           disabled={loading !== null}
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+          className="rounded-md border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-60"
         >
           {loading === "link" ? "Membuat link..." : "Buat Link Setup Password"}
         </button>
       </div>
 
       {setupUrl && (
-        <div className="mt-4 rounded-md border border-blue-200 bg-blue-50 p-3">
-          <p className="text-xs text-blue-700">
+        <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3">
+          <p className="text-xs text-emerald-800">
             Bagikan tautan ini ke peserta secara manual (WhatsApp/lainnya) — tautan ini tidak dikirim otomatis lewat email:
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <code className="break-all rounded bg-white px-2 py-1 text-xs text-slate-700">
+            <code className="break-all rounded bg-white px-2 py-1 text-xs text-stone-700">
               {setupUrl}
             </code>
             <button
               onClick={copyLink}
-              className="rounded-md bg-blue-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-800"
+              className="rounded-md bg-emerald-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-900"
             >
               {copied ? "Tersalin!" : "Salin"}
             </button>

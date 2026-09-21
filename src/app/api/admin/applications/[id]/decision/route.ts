@@ -221,7 +221,8 @@ export async function POST(
     },
   });
 
-  const setupUrl = `/setup-password?token=${setupToken}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const setupUrl = `${siteUrl}/setup-password?token=${setupToken}`;
 
   await sendNotificationEmail({
     to: application.email,

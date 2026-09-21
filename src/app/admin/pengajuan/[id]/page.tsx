@@ -21,14 +21,14 @@ export default async function AdminPengajuanDetailPage({
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="space-y-6 lg:col-span-2">
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
+        <div className="rounded-lg border border-stone-200 bg-white p-5">
           <div className="flex items-center justify-between">
-            <p className="font-mono text-sm text-slate-500">
+            <p className="font-mono text-sm text-stone-500">
               {application.nomorPengajuan}
             </p>
             <ApplicationStatusBadge status={application.status} />
           </div>
-          <h1 className="mt-2 text-xl font-bold text-slate-900">
+          <h1 className="mt-2 text-xl font-serif font-bold text-stone-900">
             {application.namaLengkap}
           </h1>
 
@@ -67,18 +67,18 @@ export default async function AdminPengajuanDetailPage({
               <Field label="Durasi" value={application.durasi} />
             </Section>
             <Section title="Catatan Pemohon">
-              <p className="text-sm text-slate-700">
+              <p className="text-sm text-stone-700">
                 {application.catatan || "-"}
               </p>
             </Section>
             {application.user && (
               <Section title="Akun Peserta">
-                <p className="text-sm text-slate-700">
-                  <span className="text-slate-400">Email login: </span>
+                <p className="text-sm text-stone-700">
+                  <span className="text-stone-400">Email login: </span>
                   {application.user.email}
                 </p>
-                <p className="text-sm text-slate-700">
-                  <span className="text-slate-400">Status: </span>
+                <p className="text-sm text-stone-700">
+                  <span className="text-stone-400">Status: </span>
                   <span
                     className={
                       application.user.isActive ? "text-emerald-600" : "text-red-600"
@@ -89,7 +89,7 @@ export default async function AdminPengajuanDetailPage({
                 </p>
                 <Link
                   href={`/admin/peserta/${application.user.id}`}
-                  className="text-sm font-medium text-blue-700 hover:underline"
+                  className="text-sm font-medium text-emerald-800 hover:underline"
                 >
                   Kelola Akun →
                 </Link>
@@ -103,35 +103,35 @@ export default async function AdminPengajuanDetailPage({
             </div>
           )}
           {application.catatanAdmin && (
-            <div className="mt-3 rounded-md bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            <div className="mt-3 rounded-md bg-stone-50 px-4 py-3 text-sm text-stone-600">
               Catatan admin: {application.catatanAdmin}
             </div>
           )}
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <h2 className="text-sm font-semibold text-slate-900">Dokumen</h2>
-          <ul className="mt-3 divide-y divide-slate-100">
+        <div className="rounded-lg border border-stone-200 bg-white p-5">
+          <h2 className="text-sm font-semibold text-stone-900">Dokumen</h2>
+          <ul className="mt-3 divide-y divide-stone-100">
             {application.documents.map((doc) => (
               <li key={doc.id} className="flex items-center justify-between py-3 text-sm">
                 <div>
-                  <p className="text-slate-800">
+                  <p className="text-stone-800">
                     {DOCUMENT_TYPE_LABEL[doc.type] ?? doc.type}
                   </p>
-                  <p className="text-xs text-slate-400">{doc.fileName}</p>
+                  <p className="text-xs text-stone-400">{doc.fileName}</p>
                 </div>
                 <a
                   href={`/api/files/${doc.id}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sm font-medium text-blue-700 hover:underline"
+                  className="text-sm font-medium text-emerald-800 hover:underline"
                 >
                   Lihat
                 </a>
               </li>
             ))}
             {application.documents.length === 0 && (
-              <li className="py-3 text-sm text-slate-400">Belum ada dokumen.</li>
+              <li className="py-3 text-sm text-stone-400">Belum ada dokumen.</li>
             )}
           </ul>
         </div>
@@ -147,7 +147,7 @@ export default async function AdminPengajuanDetailPage({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">
         {title}
       </h3>
       <div className="space-y-1">{children}</div>
@@ -157,8 +157,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Field({ label, value }: { label: string; value?: string | null }) {
   return (
-    <p className="text-sm text-slate-700">
-      <span className="text-slate-400">{label}: </span>
+    <p className="text-sm text-stone-700">
+      <span className="text-stone-400">{label}: </span>
       {value || "-"}
     </p>
   );
