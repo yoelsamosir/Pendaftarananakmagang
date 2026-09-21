@@ -1,12 +1,13 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { requireEnv } from "./env";
 
 // Client dengan service role key — HANYA dipakai di server (API routes) untuk
 // operasi admin: membuat akun peserta, generate link setup password, dan
 // akses Supabase Storage secara penuh (bypass RLS). Jangan pernah dikirim ke client.
 export function createAdminClient() {
   return createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    requireEnv("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL),
+    requireEnv("SUPABASE_SERVICE_ROLE_KEY", process.env.SUPABASE_SERVICE_ROLE_KEY),
     {
       auth: {
         autoRefreshToken: false,
