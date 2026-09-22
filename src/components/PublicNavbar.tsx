@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
 const links = [
@@ -6,9 +9,12 @@ const links = [
   { href: "/#alur", label: "Alur" },
   { href: "/#faq", label: "FAQ" },
   { href: "/status", label: "Cek Status" },
+  { href: "/login", label: "Masuk" },
 ];
 
 export default function PublicNavbar() {
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-30 border-b border-stone-200 bg-stone-50/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
@@ -26,11 +32,13 @@ export default function PublicNavbar() {
           </span>
         </Link>
         <nav className="hidden items-center gap-6 text-sm font-medium text-stone-600 md:flex">
-          {links.map((l) => (
-            <Link key={l.href} href={l.href} className="hover:text-emerald-800">
-              {l.label}
-            </Link>
-          ))}
+          {links
+            .filter((l) => l.label !== "Masuk")
+            .map((l) => (
+              <Link key={l.href} href={l.href} className="hover:text-emerald-800">
+                {l.label}
+              </Link>
+            ))}
         </nav>
         <div className="flex items-center gap-2">
           <Link
@@ -41,12 +49,38 @@ export default function PublicNavbar() {
           </Link>
           <Link
             href="/login"
-            className="hidden rounded-md border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 sm:block"
+            className="hidden rounded-md border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 md:block"
           >
             Masuk
           </Link>
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-label={open ? "Tutup menu" : "Buka menu"}
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-stone-300 text-stone-700 md:hidden"
+          >
+            <span className="text-lg leading-none">{open ? "✕" : "☰"}</span>
+          </button>
         </div>
       </div>
+
+      {open && (
+        <nav className="border-t border-stone-200 bg-stone-50 px-4 py-3 md:hidden">
+          <ul className="flex flex-col gap-1">
+            {links.map((l) => (
+              <li key={l.href}>
+                <Link
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  className="block rounded-md px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-emerald-800"
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
     </header>
   );
 }

@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import DatePickerField from "@/components/DatePickerField";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 type Room = { id: string; name: string };
 type Participant = { id: string; name: string; application: { namaLengkap: string } | null };
@@ -19,6 +20,9 @@ export default function AdminJadwalPage() {
   const [error, setError] = useState<string | null>(null);
   const [newRoomName, setNewRoomName] = useState("");
   const [scheduleFormKey, setScheduleFormKey] = useState(0);
+  const [confirmTarget, setConfirmTarget] = useState<
+    { type: "room"; id: string; name: string } | { type: "schedule"; id: string } | null
+  >(null);
 
   async function loadAll() {
     const [roomsRes, participantsRes, schedulesRes] = await Promise.all([
@@ -54,7 +58,6 @@ export default function AdminJadwalPage() {
   }
 
   async function handleDeleteRoom(id: string) {
-    if (!confirm("Hapus ruangan ini?")) return;
     await fetch(`/api/admin/rooms/${id}`, { method: "DELETE" });
     loadAll();
   }
@@ -84,9 +87,18 @@ export default function AdminJadwalPage() {
   }
 
   async function handleDeleteSchedule(id: string) {
-    if (!confirm("Hapus jadwal ini?")) return;
     await fetch(`/api/admin/schedules/${id}`, { method: "DELETE" });
     loadAll();
+  }
+
+  async function handleConfirmedDelete() {
+    if (!confirmTarget) return;
+    if (confirmTarget.type === "room") {
+      await handleDeleteRoom(confirmTarget.id);
+    } else {
+      await handleDeleteSchedule(confirmTarget.id);
+    }
+    setConfirmTarget(null);
   }
 
   return (
@@ -119,7 +131,7 @@ export default function AdminJadwalPage() {
               <li key={r.id} className="flex items-center justify-between py-2 text-sm">
                 <span>{r.name}</span>
                 <button
-                  onClick={() => handleDeleteRoom(r.id)}
+                  onClick={() => setConfirmTarget({ type: "room", id: r.id, name: r.name })}
                   className="text-red-600 hover:underline"
                 >
                   Hapus
@@ -194,7 +206,7 @@ export default function AdminJadwalPage() {
                   <td className="px-3 py-2">{s.room.name}</td>
                   <td className="px-3 py-2 text-right">
                     <button
-                      onClick={() => handleDeleteSchedule(s.id)}
+                      onClick={() => setConfirmTarget({ type: "schedule", id: s.id })}
                       className="text-red-600 hover:underline"
                     >
                       Hapus
@@ -213,6 +225,18 @@ export default function AdminJadwalPage() {
           </table>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmTarget !== null}
+        title={confirmTarget?.type === "room" ? "Hapus Ruangan" : "Hapus Jadwal"}
+        message={
+          confirmTarget?.type === "room"
+            ? `Yakin ingin menghapus ruangan "${confirmTarget.name}"? Jadwal yang terkait mungkin akan terpengaruh.`
+            : "Yakin ingin menghapus jadwal penempatan ini?"
+        }
+        onConfirm={handleConfirmedDelete}
+        onCancel={() => setConfirmTarget(null)}
+      />
     </div>
   );
 }

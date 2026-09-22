@@ -56,3 +56,7 @@ export const changePasswordSchema = z
 export const updateProfileSchema = z.object({
   name: z.string().min(3, "Nama minimal 3 karakter"),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Format email tidak valid"),
+});
