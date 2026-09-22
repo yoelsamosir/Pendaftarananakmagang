@@ -3,6 +3,7 @@
 import { useEffect, useState, FormEvent } from "react";
 import Link from "next/link";
 import PublicNavbar from "@/components/PublicNavbar";
+import DatePickerField from "@/components/DatePickerField";
 
 type Division = { id: string; name: string };
 
@@ -110,7 +111,11 @@ export default function DaftarPage() {
               <Field label="Nama Lengkap" name="namaLengkap" required />
               <Field label="Email" name="email" type="email" required />
               <Field label="Nomor Telepon" name="telepon" required />
-              <Field label="Tanggal Lahir" name="tanggalLahir" type="date" />
+              <DatePickerField
+                label="Tanggal Lahir"
+                name="tanggalLahir"
+                maxDate={new Date()}
+              />
             </div>
             <Field label="Alamat" name="alamat" textarea />
           </fieldset>
@@ -154,17 +159,17 @@ export default function DaftarPage() {
                   ))}
                 </select>
               </div>
-              <Field
+              <DatePickerField
                 label="Rencana Mulai"
                 name="rencanaMulai"
-                type="date"
                 required
+                minDate={new Date()}
               />
-              <Field
+              <DatePickerField
                 label="Rencana Selesai"
                 name="rencanaSelesai"
-                type="date"
                 required
+                minDate={new Date()}
               />
               <Field label="Durasi" name="durasi" placeholder="mis. 2 bulan" />
             </div>

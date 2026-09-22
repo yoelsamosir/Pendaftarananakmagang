@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import DatePickerField from "@/components/DatePickerField";
 
 type Room = { id: string; name: string };
 type Participant = { id: string; name: string; application: { namaLengkap: string } | null };
@@ -17,6 +18,7 @@ export default function AdminJadwalPage() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [newRoomName, setNewRoomName] = useState("");
+  const [scheduleFormKey, setScheduleFormKey] = useState(0);
 
   async function loadAll() {
     const [roomsRes, participantsRes, schedulesRes] = await Promise.all([
@@ -77,6 +79,7 @@ export default function AdminJadwalPage() {
       return;
     }
     form.reset();
+    setScheduleFormKey((k) => k + 1);
     loadAll();
   }
 
@@ -131,7 +134,7 @@ export default function AdminJadwalPage() {
 
         <div className="rounded-lg border border-stone-200 bg-white p-5">
           <h2 className="text-sm font-semibold text-stone-900">Tambah Jadwal Penempatan</h2>
-          <form onSubmit={handleAddSchedule} className="mt-3 space-y-3">
+          <form key={scheduleFormKey} onSubmit={handleAddSchedule} className="mt-3 space-y-3">
             <select
               name="userId"
               required
@@ -156,12 +159,7 @@ export default function AdminJadwalPage() {
                 </option>
               ))}
             </select>
-            <input
-              type="date"
-              name="date"
-              required
-              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
-            />
+            <DatePickerField label="Tanggal" name="date" required />
             <button className="w-full rounded-md bg-emerald-800 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-900">
               Tambah Jadwal
             </button>
