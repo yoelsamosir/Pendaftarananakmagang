@@ -79,13 +79,13 @@ export default function AdminPenyelesaianPage() {
                   value={notes[r.id] || ""}
                   onChange={(e) => setNotes((prev) => ({ ...prev, [r.id]: e.target.value }))}
                   rows={2}
-                  className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+                  className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
                 />
                 <div className="flex flex-wrap gap-3">
                   <button
                     onClick={() => decide(r.id, "DISETUJUI")}
                     disabled={loadingId === r.id}
-                    className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                    className="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
                   >
                     Setujui & Terbitkan Surat
                   </button>

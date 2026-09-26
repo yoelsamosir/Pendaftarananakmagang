@@ -5,6 +5,7 @@ import Link from "next/link";
 
 const links = [
   { href: "/", label: "Beranda" },
+  { href: "/#layanan", label: "Layanan" },
   { href: "/#persyaratan", label: "Persyaratan" },
   { href: "/#alur", label: "Alur" },
   { href: "/#faq", label: "FAQ" },
@@ -19,7 +20,7 @@ export default function PublicNavbar() {
     <header className="sticky top-0 z-30 border-b border-stone-200 bg-stone-50/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-400/40 bg-emerald-900 font-serif text-sm font-bold text-amber-300">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-400/40 bg-red-900 font-serif text-sm font-bold text-amber-300">
             BLP
           </span>
           <span className="leading-tight">
@@ -35,7 +36,7 @@ export default function PublicNavbar() {
           {links
             .filter((l) => l.label !== "Masuk")
             .map((l) => (
-              <Link key={l.href} href={l.href} className="hover:text-emerald-800">
+              <Link key={l.href} href={l.href} className="hover:text-red-800">
                 {l.label}
               </Link>
             ))}
@@ -43,7 +44,7 @@ export default function PublicNavbar() {
         <div className="flex items-center gap-2">
           <Link
             href="/daftar"
-            className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-900"
+            className="rounded-md bg-red-800 px-4 py-2 text-sm font-semibold text-white hover:bg-red-900"
           >
             Daftar Magang
           </Link>
@@ -72,7 +73,7 @@ export default function PublicNavbar() {
                 <Link
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-emerald-800"
+                  className="block rounded-md px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-red-800"
                 >
                   {l.label}
                 </Link>

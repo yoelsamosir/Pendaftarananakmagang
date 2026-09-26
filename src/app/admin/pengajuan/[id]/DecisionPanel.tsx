@@ -66,7 +66,7 @@ export default function DecisionPanel({
         </div>
       )}
       {message && (
-        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+        <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
           {message}
         </div>
       )}
@@ -79,7 +79,7 @@ export default function DecisionPanel({
           value={note}
           onChange={(e) => setNote(e.target.value)}
           rows={2}
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
         />
       </div>
 
@@ -91,7 +91,7 @@ export default function DecisionPanel({
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           rows={2}
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
         />
       </div>
 
@@ -99,7 +99,7 @@ export default function DecisionPanel({
         <button
           onClick={() => decide("TERIMA")}
           disabled={loading !== null}
-          className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
         >
           {loading === "TERIMA" ? "Memproses..." : "Terima"}
         </button>

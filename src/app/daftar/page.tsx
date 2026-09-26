@@ -49,7 +49,7 @@ export default function DaftarPage() {
       <div className="flex min-h-full flex-col">
         <PublicNavbar />
         <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center px-4 py-20 text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-3xl text-emerald-600">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl text-green-600">
             ✓
           </div>
           <h1 className="text-2xl font-serif font-bold text-stone-900">
@@ -58,7 +58,7 @@ export default function DaftarPage() {
           <p className="mt-3 text-stone-600">
             Nomor pengajuan Anda adalah
           </p>
-          <p className="mt-1 text-2xl font-mono font-bold text-emerald-800">
+          <p className="mt-1 text-2xl font-mono font-bold text-red-800">
             {result.nomorPengajuan}
           </p>
           <p className="mt-3 max-w-md text-sm text-stone-500">
@@ -68,7 +68,7 @@ export default function DaftarPage() {
           <div className="mt-8 flex gap-3">
             <Link
               href="/status"
-              className="rounded-md bg-emerald-800 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900"
+              className="rounded-md bg-red-800 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-900"
             >
               Cek Status Pengajuan
             </Link>
@@ -149,7 +149,7 @@ export default function DaftarPage() {
                 </label>
                 <select
                   name="divisiId"
-                  className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+                  className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
                 >
                   <option value="">Belum ditentukan</option>
                   {divisions.map((d) => (
@@ -202,7 +202,7 @@ export default function DaftarPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-md bg-emerald-800 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-900 disabled:opacity-60"
+            className="w-full rounded-md bg-red-800 px-6 py-3 text-sm font-semibold text-white hover:bg-red-900 disabled:opacity-60"
           >
             {submitting ? "Mengirim..." : "Kirim Pengajuan"}
           </button>
@@ -239,7 +239,7 @@ function Field({
           required={required}
           placeholder={placeholder}
           rows={3}
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
         />
       ) : (
         <input
@@ -247,7 +247,7 @@ function Field({
           name={name}
           required={required}
           placeholder={placeholder}
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
         />
       )}
     </div>
@@ -274,7 +274,7 @@ function FileField({
         name={name}
         required={required}
         accept=".pdf,.doc,.docx"
-        className="block w-full text-sm text-stone-600 file:mr-4 file:rounded-md file:border-0 file:bg-emerald-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-emerald-800 hover:file:bg-emerald-100"
+        className="block w-full text-sm text-stone-600 file:mr-4 file:rounded-md file:border-0 file:bg-red-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-red-800 hover:file:bg-red-100"
       />
     </div>
   );

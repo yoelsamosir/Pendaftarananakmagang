@@ -21,9 +21,9 @@ export default function DashboardShell({
 
   return (
     <div className="flex min-h-screen bg-stone-100">
-      <aside className="hidden w-64 shrink-0 flex-col bg-emerald-950 text-stone-100 md:flex">
-        <div className="flex items-center gap-2 border-b border-emerald-900 px-5 py-5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-400/40 bg-emerald-900 text-sm font-serif font-bold text-amber-300">
+      <aside className="hidden w-64 shrink-0 flex-col bg-red-950 text-stone-100 md:flex">
+        <div className="flex items-center gap-2 border-b border-red-900 px-5 py-5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-400/40 bg-red-900 text-sm font-serif font-bold text-amber-300">
             BLP
           </span>
           <span className="font-serif text-sm font-semibold leading-tight text-stone-50">
@@ -35,14 +35,14 @@ export default function DashboardShell({
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-stone-300 hover:bg-emerald-900 hover:text-amber-200"
+              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-stone-300 hover:bg-red-900 hover:text-amber-200"
             >
               <span>{item.icon}</span>
               <span>{item.label}</span>
             </Link>
           ))}
         </nav>
-        <div className="border-t border-emerald-900 px-3 py-4">
+        <div className="border-t border-red-900 px-3 py-4">
           <p className="mb-2 truncate px-3 text-xs text-stone-400">
             {userName}
           </p>
@@ -53,7 +53,7 @@ export default function DashboardShell({
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-stone-200 bg-white px-4 py-3 md:hidden">
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-amber-400/40 bg-emerald-900 font-serif text-xs font-bold text-amber-300">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-amber-400/40 bg-red-900 font-serif text-xs font-bold text-amber-300">
               BLP
             </span>
             <span className="font-serif text-sm font-semibold text-stone-900">{title}</span>
@@ -74,10 +74,10 @@ export default function DashboardShell({
               className="absolute inset-0 bg-stone-900/50"
               onClick={() => setMobileNavOpen(false)}
             />
-            <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85%] flex-col bg-emerald-950 text-stone-100 shadow-xl">
-              <div className="flex items-center justify-between gap-2 border-b border-emerald-900 px-5 py-5">
+            <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85%] flex-col bg-red-950 text-stone-100 shadow-xl">
+              <div className="flex items-center justify-between gap-2 border-b border-red-900 px-5 py-5">
                 <div className="flex items-center gap-2">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-400/40 bg-emerald-900 text-sm font-serif font-bold text-amber-300">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-400/40 bg-red-900 text-sm font-serif font-bold text-amber-300">
                     BLP
                   </span>
                   <span className="font-serif text-sm font-semibold leading-tight text-stone-50">
@@ -88,7 +88,7 @@ export default function DashboardShell({
                   type="button"
                   onClick={() => setMobileNavOpen(false)}
                   aria-label="Tutup menu"
-                  className="flex h-8 w-8 items-center justify-center rounded-md text-stone-300 hover:bg-emerald-900"
+                  className="flex h-8 w-8 items-center justify-center rounded-md text-stone-300 hover:bg-red-900"
                 >
                   ✕
                 </button>
@@ -99,14 +99,14 @@ export default function DashboardShell({
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileNavOpen(false)}
-                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-stone-300 hover:bg-emerald-900 hover:text-amber-200"
+                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-stone-300 hover:bg-red-900 hover:text-amber-200"
                   >
                     <span>{item.icon}</span>
                     <span>{item.label}</span>
                   </Link>
                 ))}
               </nav>
-              <div className="border-t border-emerald-900 px-3 py-4">
+              <div className="border-t border-red-900 px-3 py-4">
                 <p className="mb-2 truncate px-3 text-xs text-stone-400">
                   {userName}
                 </p>

@@ -73,7 +73,7 @@ export default function AccountPanel({
         </div>
         <span
           className={`rounded-full px-3 py-1 text-xs font-medium ${
-            isActive ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+            isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
           }`}
         >
           {isActive ? "Aktif" : "Nonaktif"}
@@ -91,7 +91,7 @@ export default function AccountPanel({
           onClick={toggleStatus}
           disabled={loading !== null}
           className={`rounded-md px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 ${
-            isActive ? "bg-red-600 hover:bg-red-700" : "bg-emerald-600 hover:bg-emerald-700"
+            isActive ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"
           }`}
         >
           {loading === "status" ? "Memproses..." : isActive ? "Nonaktifkan Akun" : "Aktifkan Akun"}
@@ -106,8 +106,8 @@ export default function AccountPanel({
       </div>
 
       {setupUrl && (
-        <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3">
-          <p className="text-xs text-emerald-800">
+        <div className="mt-4 rounded-md border border-blue-200 bg-blue-50 p-3">
+          <p className="text-xs text-blue-800">
             Bagikan tautan ini ke peserta secara manual (WhatsApp/lainnya) — tautan ini tidak dikirim otomatis lewat email:
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -116,7 +116,7 @@ export default function AccountPanel({
             </code>
             <button
               onClick={copyLink}
-              className="rounded-md bg-emerald-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-900"
+              className="rounded-md bg-red-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-900"
             >
               {copied ? "Tersalin!" : "Salin"}
             </button>

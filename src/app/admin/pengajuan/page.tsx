@@ -49,7 +49,7 @@ export default async function AdminPengajuanPage({
             href={f.value ? `/admin/pengajuan?status=${f.value}` : "/admin/pengajuan"}
             className={`rounded-full px-3 py-1.5 text-xs font-medium ${
               status === f.value
-                ? "bg-emerald-800 text-white"
+                ? "bg-red-800 text-white"
                 : "bg-white text-stone-600 border border-stone-200"
             }`}
           >
@@ -64,7 +64,7 @@ export default async function AdminPengajuanPage({
           name="q"
           defaultValue={q}
           placeholder="Cari nama, nomor pengajuan, email, atau institusi..."
-          className="w-full max-w-md rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+          className="w-full max-w-md rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
         />
       </form>
 
@@ -92,7 +92,7 @@ export default async function AdminPengajuanPage({
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/pengajuan/${a.id}`}
-                    className="font-mono text-emerald-800 hover:underline"
+                    className="font-mono text-red-800 hover:underline"
                   >
                     {a.nomorPengajuan}
                   </Link>

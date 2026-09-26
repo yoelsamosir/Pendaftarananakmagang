@@ -47,7 +47,7 @@ function SetupPasswordForm() {
   if (done) {
     return (
       <div className="mx-auto max-w-sm px-4 py-16 text-center">
-        <p className="text-emerald-600">
+        <p className="text-red-600">
           Password berhasil dibuat. Mengalihkan ke dashboard...
         </p>
       </div>
@@ -77,7 +77,7 @@ function SetupPasswordForm() {
             type="password"
             minLength={8}
             required
-            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
           />
         </div>
         <div>
@@ -89,13 +89,13 @@ function SetupPasswordForm() {
             type="password"
             minLength={8}
             required
-            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-emerald-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900 disabled:opacity-60"
+          className="w-full rounded-md bg-red-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-red-900 disabled:opacity-60"
         >
           {loading ? "Menyimpan..." : "Simpan Password"}
         </button>

@@ -120,9 +120,9 @@ export default function AdminJadwalPage() {
               onChange={(e) => setNewRoomName(e.target.value)}
               placeholder="Nama ruangan baru"
               required
-              className="flex-1 rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+              className="flex-1 rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
             />
-            <button className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-900">
+            <button className="rounded-md bg-red-800 px-4 py-2 text-sm font-semibold text-white hover:bg-red-900">
               Tambah
             </button>
           </form>
@@ -150,7 +150,7 @@ export default function AdminJadwalPage() {
             <select
               name="userId"
               required
-              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
             >
               <option value="">Pilih peserta</option>
               {participants.map((p) => (
@@ -162,7 +162,7 @@ export default function AdminJadwalPage() {
             <select
               name="roomId"
               required
-              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
             >
               <option value="">Pilih ruangan</option>
               {rooms.map((r) => (
@@ -172,7 +172,7 @@ export default function AdminJadwalPage() {
               ))}
             </select>
             <DatePickerField label="Tanggal" name="date" required />
-            <button className="w-full rounded-md bg-emerald-800 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-900">
+            <button className="w-full rounded-md bg-red-800 px-4 py-2 text-sm font-semibold text-white hover:bg-red-900">
               Tambah Jadwal
             </button>
           </form>

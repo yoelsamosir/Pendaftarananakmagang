@@ -38,7 +38,7 @@ export default async function AdminPesertaPage() {
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/peserta/${p.id}`}
-                    className="font-medium text-emerald-800 hover:underline"
+                    className="font-medium text-red-800 hover:underline"
                   >
                     {p.name}
                   </Link>
@@ -61,7 +61,7 @@ export default async function AdminPesertaPage() {
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-medium ${
                       p.isActive
-                        ? "bg-emerald-100 text-emerald-700"
+                        ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
                     }`}
                   >

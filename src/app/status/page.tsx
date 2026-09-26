@@ -63,7 +63,7 @@ export default function StatusPage() {
               name="nomor"
               required
               placeholder="MAG-2026-0001"
-              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
             />
           </div>
           <div>
@@ -74,13 +74,13 @@ export default function StatusPage() {
               name="email"
               type="email"
               required
-              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-emerald-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900 disabled:opacity-60"
+            className="w-full rounded-md bg-red-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-red-900 disabled:opacity-60"
           >
             {loading ? "Memeriksa..." : "Cek Status"}
           </button>
@@ -114,7 +114,7 @@ export default function StatusPage() {
               </p>
             )}
             {data.status === "DITERIMA" && (
-              <p className="mt-3 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+              <p className="mt-3 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
                 Selamat! Pengajuan Anda diterima. Silakan periksa email untuk
                 informasi setup akun.
               </p>

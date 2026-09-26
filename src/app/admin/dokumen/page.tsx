@@ -56,7 +56,7 @@ export default async function AdminDokumenPage() {
                     href={`/api/files/${d.id}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-medium text-emerald-800 hover:underline"
+                    className="font-medium text-red-800 hover:underline"
                   >
                     Lihat
                   </a>

@@ -66,7 +66,7 @@ export default function DataSayaPage() {
         </div>
       )}
       {message && (
-        <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+        <div className="mt-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
           {message}
         </div>
       )}
@@ -100,13 +100,13 @@ export default function DataSayaPage() {
             name="alamat"
             defaultValue={data.alamat || ""}
             rows={3}
-            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
           />
         </div>
         <button
           type="submit"
           disabled={saving}
-          className="rounded-md bg-emerald-800 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900 disabled:opacity-60"
+          className="rounded-md bg-red-800 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-900 disabled:opacity-60"
         >
           {saving ? "Menyimpan..." : "Simpan Perubahan"}
         </button>
@@ -130,7 +130,7 @@ function Field({
       <input
         name={name}
         defaultValue={defaultValue || ""}
-        className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+        className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
       />
     </div>
   );

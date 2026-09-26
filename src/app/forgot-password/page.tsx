@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
         )}
 
         {done ? (
-          <div className="mt-6 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          <div className="mt-6 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             Jika email terdaftar, tautan reset password sudah dikirim. Silakan
             cek inbox (dan folder spam) email Anda.
           </div>
@@ -61,13 +61,13 @@ export default function ForgotPasswordPage() {
                 name="email"
                 type="email"
                 required
-                className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+                className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-md bg-emerald-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900 disabled:opacity-60"
+              className="w-full rounded-md bg-red-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-red-900 disabled:opacity-60"
             >
               {loading ? "Mengirim..." : "Kirim Tautan Reset"}
             </button>
@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
         )}
 
         <p className="mt-6 text-center text-sm text-stone-500">
-          <Link href="/login" className="font-medium text-emerald-800">
+          <Link href="/login" className="font-medium text-red-800">
             Kembali ke halaman masuk
           </Link>
         </p>

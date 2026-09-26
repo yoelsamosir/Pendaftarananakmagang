@@ -73,7 +73,7 @@ export default async function AdminPesertaDetailPage({
                 href={`/api/files/${doc.id}`}
                 target="_blank"
                 rel="noreferrer"
-                className="font-medium text-emerald-800 hover:underline"
+                className="font-medium text-red-800 hover:underline"
               >
                 Lihat
               </a>

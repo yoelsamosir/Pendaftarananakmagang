@@ -81,7 +81,7 @@ export default async function AdminPengajuanDetailPage({
                   <span className="text-stone-400">Status: </span>
                   <span
                     className={
-                      application.user.isActive ? "text-emerald-600" : "text-red-600"
+                      application.user.isActive ? "text-red-600" : "text-red-600"
                     }
                   >
                     {application.user.isActive ? "Aktif" : "Nonaktif"}
@@ -89,7 +89,7 @@ export default async function AdminPengajuanDetailPage({
                 </p>
                 <Link
                   href={`/admin/peserta/${application.user.id}`}
-                  className="text-sm font-medium text-emerald-800 hover:underline"
+                  className="text-sm font-medium text-red-800 hover:underline"
                 >
                   Kelola Akun →
                 </Link>
@@ -124,7 +124,7 @@ export default async function AdminPengajuanDetailPage({
                   href={`/api/files/${doc.id}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sm font-medium text-emerald-800 hover:underline"
+                  className="text-sm font-medium text-red-800 hover:underline"
                 >
                   Lihat
                 </a>
