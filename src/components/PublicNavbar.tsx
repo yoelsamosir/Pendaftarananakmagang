@@ -19,16 +19,16 @@ export default function PublicNavbar() {
   return (
     <header className="sticky top-0 z-30 border-b border-stone-200 bg-stone-50/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-400/40 bg-red-900 font-serif text-sm font-bold text-amber-300">
-            BLP
-          </span>
-          <span className="leading-tight">
+        <Link href="/" className="flex min-w-0 shrink items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-balai-yanpus.svg"
+            alt="Balai Layanan Perpustakaan"
+            className="h-auto w-28 shrink-0 sm:w-40"
+          />
+          <span className="hidden border-l border-stone-300 pl-2 leading-tight sm:block">
             <span className="block font-serif text-sm font-semibold text-stone-900">
               Sistem Magang
-            </span>
-            <span className="block text-xs text-stone-500">
-              Balai Layanan Perpustakaan DIY
             </span>
           </span>
         </Link>
@@ -41,10 +41,10 @@ export default function PublicNavbar() {
               </Link>
             ))}
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <Link
             href="/daftar"
-            className="rounded-md bg-red-800 px-4 py-2 text-sm font-semibold text-white hover:bg-red-900"
+            className="whitespace-nowrap rounded-md bg-red-800 px-3 py-2 text-sm font-semibold text-white hover:bg-red-900 sm:px-4"
           >
             Daftar Magang
           </Link>

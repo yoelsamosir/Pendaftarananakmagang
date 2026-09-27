@@ -6,13 +6,19 @@ import { useState } from "react";
 export default function DecisionPanel({
   applicationId,
   status,
+  nomorSuratAsal,
+  tanggalSuratAsal,
 }: {
   applicationId: string;
   status: string;
+  nomorSuratAsal?: string | null;
+  tanggalSuratAsal?: string | null;
 }) {
   const router = useRouter();
   const [note, setNote] = useState("");
   const [reason, setReason] = useState("");
+  const [suratAsal, setSuratAsal] = useState(nomorSuratAsal || "");
+  const [tanggalAsal, setTanggalAsal] = useState(tanggalSuratAsal || "");
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -29,6 +35,8 @@ export default function DecisionPanel({
           decision,
           catatanAdmin: note || undefined,
           alasanTolak: reason || undefined,
+          nomorSuratAsal: decision === "TERIMA" ? suratAsal || undefined : undefined,
+          tanggalSuratAsal: decision === "TERIMA" ? tanggalAsal || undefined : undefined,
         }),
       });
       const json = await res.json();
@@ -70,6 +78,36 @@ export default function DecisionPanel({
           {message}
         </div>
       )}
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-stone-700">
+            Nomor Surat Asal (untuk surat balasan)
+          </label>
+          <input
+            value={suratAsal}
+            onChange={(e) => setSuratAsal(e.target.value)}
+            placeholder="mis. 434/I.A2/MG-SI/2026"
+            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-stone-700">
+            Tanggal Surat Asal
+          </label>
+          <input
+            type="date"
+            value={tanggalAsal}
+            onChange={(e) => setTanggalAsal(e.target.value)}
+            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
+          />
+        </div>
+      </div>
+      <p className="-mt-2 text-xs text-stone-500">
+        Dipakai untuk kalimat &ldquo;Menindaklanjuti surat nomor ... tanggal
+        ...&rdquo; pada surat balasan penerimaan. Lengkapi jika belum diisi
+        pemohon.
+      </p>
 
       <div>
         <label className="mb-1 block text-sm font-medium text-stone-700">

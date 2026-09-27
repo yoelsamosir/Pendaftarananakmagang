@@ -65,6 +65,15 @@ export default async function AdminPengajuanDetailPage({
                 value={application.rencanaSelesai.toLocaleDateString("id-ID")}
               />
               <Field label="Durasi" value={application.durasi} />
+              <Field label="Nomor Surat Asal" value={application.nomorSuratAsal} />
+              <Field
+                label="Tanggal Surat Asal"
+                value={
+                  application.tanggalSuratAsal
+                    ? application.tanggalSuratAsal.toLocaleDateString("id-ID")
+                    : null
+                }
+              />
             </Section>
             <Section title="Catatan Pemohon">
               <p className="text-sm text-stone-700">
@@ -138,7 +147,16 @@ export default async function AdminPengajuanDetailPage({
       </div>
 
       <div>
-        <DecisionPanel applicationId={application.id} status={application.status} />
+        <DecisionPanel
+          applicationId={application.id}
+          status={application.status}
+          nomorSuratAsal={application.nomorSuratAsal}
+          tanggalSuratAsal={
+            application.tanggalSuratAsal
+              ? application.tanggalSuratAsal.toISOString().slice(0, 10)
+              : null
+          }
+        />
       </div>
     </div>
   );

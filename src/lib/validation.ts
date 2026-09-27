@@ -22,6 +22,8 @@ export const applicationSchema = z.object({
   durasi: z.string().optional(),
   divisiId: z.string().optional(),
   catatan: z.string().optional(),
+  nomorSuratAsal: z.string().optional(),
+  tanggalSuratAsal: z.string().optional(),
 });
 
 export type ApplicationInput = z.infer<typeof applicationSchema>;

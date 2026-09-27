@@ -98,6 +98,10 @@ export async function POST(req: NextRequest) {
       durasi: data.durasi || null,
       divisiId: data.divisiId || null,
       catatan: data.catatan || null,
+      nomorSuratAsal: data.nomorSuratAsal || null,
+      tanggalSuratAsal: data.tanggalSuratAsal
+        ? new Date(data.tanggalSuratAsal)
+        : null,
     },
   });
 

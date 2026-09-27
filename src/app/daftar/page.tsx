@@ -180,6 +180,24 @@ export default function DaftarPage() {
             <legend className="text-base font-semibold text-stone-900">
               4. Dokumen
             </legend>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field
+                label="Nomor Surat Permohonan dari Kampus/Sekolah"
+                name="nomorSuratAsal"
+                placeholder="mis. 434/I.A2/MG-SI/2026"
+              />
+              <DatePickerField
+                label="Tanggal Surat Permohonan"
+                name="tanggalSuratAsal"
+                maxDate={new Date()}
+              />
+            </div>
+            <p className="-mt-2 text-xs text-stone-500">
+              Nomor dan tanggal surat pengantar/permohonan magang yang
+              diterbitkan kampus/sekolah Anda (tertera pada surat yang
+              diunggah di bawah). Isi jika sudah tersedia — jika belum,
+              kolom ini bisa dilengkapi admin saat verifikasi.
+            </p>
             <FileField
               label="Surat Izin / Permohonan Magang"
               name="dokumen_surat_permohonan"

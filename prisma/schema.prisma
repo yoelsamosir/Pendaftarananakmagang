@@ -88,13 +88,15 @@ model Application {
   semesterKelas String?
 
   // data magang
-  jenisMagang     String?
-  rencanaMulai    DateTime
-  rencanaSelesai  DateTime
-  durasi          String?
-  divisiId        String?
-  divisi          Division? @relation(fields: [divisiId], references: [id])
-  catatan         String?
+  jenisMagang      String?
+  rencanaMulai     DateTime
+  rencanaSelesai   DateTime
+  durasi           String?
+  divisiId         String?
+  divisi           Division? @relation(fields: [divisiId], references: [id])
+  catatan          String?
+  nomorSuratAsal   String?
+  tanggalSuratAsal DateTime?
 
   // keputusan admin
   catatanAdmin String?

@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { DOCUMENT_TYPE_LABEL } from "@/lib/constants";
+import { ID_CARD_CANVA_URL, dokumenAdministrasi } from "@/lib/internshipDocuments";
 
 const CATEGORY_LABEL: Record<string, string> = {
   PENGAJUAN: "Dokumen Pengajuan",
@@ -54,6 +55,54 @@ export default async function DokumenPage() {
               className="rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
             >
               Lihat / Download
+            </a>
+          </div>
+        ))}
+      </div>
+
+      <h2 className="mt-10 text-base font-semibold text-stone-900">
+        Formulir & Template Administrasi Magang
+      </h2>
+      <p className="mt-1 text-sm text-stone-500">
+        Unduh, isi, dan cetak dokumen berikut sesuai arahan pendamping magang,
+        lalu masukkan ke dalam map transparan (snelhecter) warna putih atau
+        hitam.
+      </p>
+      <div className="mt-4 space-y-3">
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-stone-200 bg-white p-4">
+          <div>
+            <p className="text-sm font-medium text-stone-800">
+              Desain ID Card Magang
+            </p>
+            <p className="text-xs text-stone-400">Template Canva</p>
+          </div>
+          <a
+            href={ID_CARD_CANVA_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="shrink-0 rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+          >
+            Buka
+          </a>
+        </div>
+        {dokumenAdministrasi.map((d, i) => (
+          <div
+            key={d.nama}
+            className="flex items-center justify-between gap-3 rounded-lg border border-stone-200 bg-white p-4"
+          >
+            <div>
+              <p className="text-sm font-medium text-stone-800">
+                {d.nama.replace(/^Lampiran \d+\.\s*/, "")}
+              </p>
+              <p className="text-xs text-stone-400">Lampiran {i + 1}</p>
+            </div>
+            <a
+              href={d.url}
+              target="_blank"
+              rel="noreferrer"
+              className="shrink-0 rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+            >
+              Unduh
             </a>
           </div>
         ))}

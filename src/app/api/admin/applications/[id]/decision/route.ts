@@ -22,6 +22,8 @@ export async function POST(
   const decision = body?.decision as "TERIMA" | "TOLAK" | "PERLU_PERBAIKAN" | undefined;
   const catatanAdmin: string | undefined = body?.catatanAdmin;
   const alasanTolak: string | undefined = body?.alasanTolak;
+  const nomorSuratAsal: string | undefined = body?.nomorSuratAsal;
+  const tanggalSuratAsal: string | undefined = body?.tanggalSuratAsal;
 
   if (!decision) {
     return NextResponse.json({ error: "Keputusan wajib diisi" }, { status: 400 });
@@ -169,6 +171,11 @@ export async function POST(
         },
       });
 
+  const finalNomorSuratAsal = nomorSuratAsal ?? application.nomorSuratAsal ?? undefined;
+  const finalTanggalSuratAsal = tanggalSuratAsal
+    ? new Date(tanggalSuratAsal)
+    : application.tanggalSuratAsal ?? undefined;
+
   await prisma.application.update({
     where: { id },
     data: {
@@ -177,6 +184,8 @@ export async function POST(
       decidedAt: new Date(),
       decidedById: session.userId,
       userId: user.id,
+      nomorSuratAsal: finalNomorSuratAsal || null,
+      tanggalSuratAsal: finalTanggalSuratAsal || null,
     },
   });
 
@@ -186,11 +195,15 @@ export async function POST(
     tanggal: new Date(),
     namaLengkap: application.namaLengkap,
     institusi: application.institusi,
+    fakultas: application.fakultas,
     programStudi: application.programStudi,
     nimNis: application.nimNis,
     divisi: application.divisi?.name,
     rencanaMulai: application.rencanaMulai,
     rencanaSelesai: application.rencanaSelesai,
+    durasi: application.durasi,
+    nomorSuratAsal: finalNomorSuratAsal,
+    tanggalSuratAsal: finalTanggalSuratAsal,
   });
   const pdfPath = await saveGeneratedFile(
     pdfBuffer,

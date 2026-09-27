@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PublicNavbar from "@/components/PublicNavbar";
+import { PEDOMAN_MAGANG_URL } from "@/lib/internshipDocuments";
 
 const alur = [
   "Baca informasi & persyaratan magang di halaman ini",
@@ -56,15 +57,6 @@ const layananInfo = [
     komponen: "Produk Pelayanan",
     uraian: ["Layanan Penelitian dan Magang."],
   },
-];
-
-const dokumenAdministrasi = [
-  "Surat Pernyataan Kesanggupan Mengikuti Magang",
-  "Tata Tertib",
-  "Deskripsi Kegiatan",
-  "Jadwal",
-  "Daftar Hadir & Laporan Harian (Log Book)",
-  "Penilaian",
 ];
 
 const faq = [
@@ -135,6 +127,15 @@ export default function HomePage() {
           selengkapnya mengikuti Pedoman Magang yang diterbitkan Balai.
         </p>
 
+        <a
+          href={PEDOMAN_MAGANG_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-5 inline-flex items-center gap-2 rounded-md bg-red-800 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-900"
+        >
+          📄 Unduh Pedoman Magang 2026 (PDF)
+        </a>
+
         <div className="mt-6 overflow-hidden rounded-lg border border-stone-200">
           <table className="w-full text-sm">
             <tbody className="divide-y divide-stone-200 bg-white">
@@ -170,8 +171,7 @@ export default function HomePage() {
             className="font-medium text-red-800 hover:underline"
           >
             Layanan Penelitian dan Magang — balaiyanpus.jogjaprov.go.id
-          </a>{" "}
-          — buka tautan ini untuk mengunduh Pedoman Magang lengkap.
+          </a>
         </p>
       </section>
 
@@ -214,24 +214,11 @@ export default function HomePage() {
             </table>
           </div>
 
-          <h3 className="mt-8 text-sm font-semibold text-stone-900">
-            Dokumen Administrasi (setelah diterima)
-          </h3>
-          <p className="mt-1 text-sm text-stone-600">
-            Peserta yang diterima melengkapi dokumen administrasi berikut
-            selama masa magang, sesuai arahan pendamping magang:
+          <p className="mt-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Dokumen administrasi (formulir, tata tertib, jadwal, log book,
+            penilaian) dan desain ID Card baru dapat diunduh peserta yang
+            diterima melalui dashboard setelah login.
           </p>
-          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-            {dokumenAdministrasi.map((d, i) => (
-              <li
-                key={d}
-                className="flex items-start gap-2 rounded-md border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700"
-              >
-                <span className="font-semibold text-amber-700">{i + 1}.</span>
-                {d}
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 

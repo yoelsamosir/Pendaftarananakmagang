@@ -7,12 +7,18 @@ type SuratPenerimaanData = {
   tanggal: Date;
   namaLengkap: string;
   institusi: string;
+  fakultas?: string | null;
   programStudi?: string | null;
   nimNis?: string | null;
   divisi?: string | null;
   rencanaMulai: Date;
   rencanaSelesai: Date;
+  durasi?: string | null;
+  nomorSuratAsal?: string | null;
+  tanggalSuratAsal?: Date | null;
 };
+
+const KEPALA_BALAI = "Drs. Martono Heri Prasetyo, M.Si";
 
 type SuratSelesaiData = {
   nomorSurat: string;
@@ -30,6 +36,11 @@ const KOP = [
   "PEMERINTAH DAERAH DAERAH ISTIMEWA YOGYAKARTA",
   "DINAS PERPUSTAKAAN DAN ARSIP DAERAH",
   "BALAI LAYANAN PERPUSTAKAAN",
+];
+
+const KOP_ALAMAT = [
+  "Gedung Grhatama Pustaka, Jalan Raya Janti, Banguntapan, Bantul (0274) 4536234",
+  "www.balaiyanpus.jogjaprov.go.id, email: balaiyanpus@jogjaprov.go.id",
 ];
 
 async function baseDoc() {
@@ -55,6 +66,19 @@ function drawKop(page: PDFPage, bold: PDFFont, font: PDFFont) {
       color: rgb(0, 0, 0),
     });
     y -= 16;
+  });
+  y -= 4;
+  KOP_ALAMAT.forEach((line) => {
+    const size = 9;
+    const textWidth = font.widthOfTextAtSize(line, size);
+    page.drawText(line, {
+      x: (width - textWidth) / 2,
+      y,
+      size,
+      font,
+      color: rgb(0, 0, 0),
+    });
+    y -= 12;
   });
   page.drawLine({
     start: { x: 50, y: y - 4 },
@@ -88,34 +112,101 @@ export async function generateSuratPenerimaanPdf(
   line(`Lampiran  : -`);
   line(`Hal       : Balasan Permohonan Magang`, bold);
   y -= lh;
-  line(`Yth. ${data.namaLengkap}`);
-  line(`${data.institusi}`);
+
+  if (data.fakultas) {
+    line(`Yth. Dekan Fakultas ${data.fakultas}`);
+    line(data.institusi);
+  } else {
+    line(`Yth. Pimpinan ${data.institusi}`);
+  }
+  line(`di tempat`);
   y -= lh;
 
-  const isi = `Menindaklanjuti permohonan magang yang Saudara/i ajukan, dengan ini kami sampaikan bahwa permohonan magang atas nama tersebut di bawah ini DITERIMA untuk melaksanakan kegiatan magang di Balai Layanan Perpustakaan, Dinas Perpustakaan dan Arsip Daerah DIY, dengan data sebagai berikut:`;
-  y = drawWrapped(page, font, isi, left, y, 495, size, lh);
+  const suratAsalText = data.nomorSuratAsal
+    ? `Menindaklanjuti surat nomor ${data.nomorSuratAsal}${
+        data.tanggalSuratAsal ? ` tanggal ${tgl(data.tanggalSuratAsal)}` : ""
+      } tentang pengantar mahasiswa PKL/magang di Balai Layanan Perpustakaan DPAD DIY, mahasiswa atas nama:`
+    : `Menindaklanjuti permohonan pengantar mahasiswa PKL/magang di Balai Layanan Perpustakaan DPAD DIY, mahasiswa atas nama:`;
+  y = drawWrapped(page, font, suratAsalText, left, y, 495, size, lh);
   y -= lh / 2;
 
-  line(`Nama              : ${data.namaLengkap}`);
-  line(`Institusi         : ${data.institusi}`);
-  if (data.programStudi) line(`Program Studi     : ${data.programStudi}`);
-  if (data.nimNis) line(`NIM/NIS           : ${data.nimNis}`);
-  if (data.divisi) line(`Divisi/Bagian     : ${data.divisi}`);
-  line(`Periode Magang    : ${tgl(data.rencanaMulai)} s.d. ${tgl(data.rencanaSelesai)}`);
+  y = drawTable(
+    page,
+    font,
+    bold,
+    [
+      ["No", "Nama", "NIM/NIS"],
+      ["1", data.namaLengkap, data.nimNis || "-"],
+    ],
+    [40, 290, 165],
+    left,
+    y,
+    22
+  );
   y -= lh;
 
-  const penutup = `Demikian surat balasan ini kami sampaikan untuk dapat dipergunakan sebagaimana mestinya. Atas perhatian dan kerja samanya, kami ucapkan terima kasih.`;
+  const durasiText = data.durasi || hitungDurasiBulan(data.rencanaMulai, data.rencanaSelesai);
+  const terimaText = `Pada prinsipnya, kami dapat menerima permohonan mahasiswa magang/KKL ke Balai Layanan Perpustakaan DPAD DIY selama ${durasiText}.`;
+  y = drawWrapped(page, font, terimaText, left, y, 495, size, lh);
+  y -= lh / 2;
+
+  const wbkText = `Sebagai informasi dapat kami sampaikan bahwa Balai Layanan Perpustakaan terus berkomitmen menjadi Unit Pelaksana Teknis (UPT) berpredikat Wilayah Bebas dari Korupsi (WBK) menuju Wilayah Birokrasi Bersih dan Melayani (WBBM). Seluruh layanan publik Balai Layanan Perpustakaan DPAD DIY mengacu kepada Standar Layanan Publik dengan tarif layanan sesuai ketentuan peraturan perundang-undangan. Dalam melaksanakan tugas pegawai Balai Layanan Perpustakaan DPAD DIY wajib memegang teguh core value ASN BerAKHLAK dan tidak diperkenankan meminta, menerima dan/atau memberikan gratifikasi dan suap dalam bentuk apapun.`;
+  y = drawWrapped(page, font, wbkText, left, y, 495, size, lh);
+  y -= lh / 2;
+
+  const penutup = `Demikian atas perhatian dan kerja samanya disampaikan terima kasih.`;
   y = drawWrapped(page, font, penutup, left, y, 495, size, lh);
 
   y -= lh * 2;
   line(`Yogyakarta, ${tgl(data.tanggal)}`, font, size, 300);
-  line(`Kepala Balai Layanan Perpustakaan`, font, size, 300);
-  y -= lh * 3;
-  line(`......................................`, font, size, 300);
-  line(`NIP. .................................`, font, size, 300);
+  line(`Kepala Balai Layanan Perpustakaan,`, font, size, 300);
+  y -= lh * 4;
+  line(KEPALA_BALAI, bold, size, 300);
 
   const bytes = await doc.save();
   return Buffer.from(bytes);
+}
+
+function hitungDurasiBulan(mulai: Date, selesai: Date) {
+  const months =
+    (selesai.getFullYear() - mulai.getFullYear()) * 12 +
+    (selesai.getMonth() - mulai.getMonth());
+  return `${Math.max(1, Math.round(months))} bulan`;
+}
+
+function drawTable(
+  page: PDFPage,
+  font: PDFFont,
+  bold: PDFFont,
+  rows: string[][],
+  colWidths: number[],
+  x: number,
+  y: number,
+  rowHeight: number
+) {
+  let curY = y;
+  rows.forEach((row, rowIndex) => {
+    let curX = x;
+    row.forEach((cell, colIndex) => {
+      page.drawRectangle({
+        x: curX,
+        y: curY - rowHeight,
+        width: colWidths[colIndex],
+        height: rowHeight,
+        borderColor: rgb(0, 0, 0),
+        borderWidth: 1,
+      });
+      page.drawText(cell, {
+        x: curX + 6,
+        y: curY - rowHeight + 7,
+        size: 10,
+        font: rowIndex === 0 ? bold : font,
+      });
+      curX += colWidths[colIndex];
+    });
+    curY -= rowHeight;
+  });
+  return curY;
 }
 
 export async function generateSuratSelesaiPdf(
