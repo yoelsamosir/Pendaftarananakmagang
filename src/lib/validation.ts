@@ -33,10 +33,19 @@ export const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+// Dipakai untuk password baru (bukan login) — cukup kuat untuk akun admin
+// maupun peserta: minimal 8 karakter, kombinasi huruf besar/kecil dan angka.
+const strongPassword = z
+  .string()
+  .min(8, "Password minimal 8 karakter")
+  .regex(/[a-z]/, "Password harus mengandung huruf kecil")
+  .regex(/[A-Z]/, "Password harus mengandung huruf besar")
+  .regex(/[0-9]/, "Password harus mengandung angka");
+
 export const setupPasswordSchema = z
   .object({
     token: z.string().min(1),
-    password: z.string().min(8, "Password minimal 8 karakter"),
+    password: strongPassword,
     confirmPassword: z.string().min(8),
   })
   .refine((d) => d.password === d.confirmPassword, {
@@ -47,7 +56,7 @@ export const setupPasswordSchema = z
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "Password saat ini wajib diisi"),
-    newPassword: z.string().min(8, "Password baru minimal 8 karakter"),
+    newPassword: strongPassword,
     confirmPassword: z.string().min(8),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {

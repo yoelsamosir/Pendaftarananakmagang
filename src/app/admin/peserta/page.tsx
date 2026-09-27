@@ -1,13 +1,29 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ApplicationStatusBadge } from "@/components/StatusBadge";
+import Pagination from "@/components/Pagination";
 
-export default async function AdminPesertaPage() {
-  const participants = await prisma.user.findMany({
-    where: { role: "PESERTA" },
-    include: { application: { include: { divisi: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+const PAGE_SIZE = 20;
+
+export default async function AdminPesertaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
+
+  const [participants, total] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: "PESERTA" },
+      include: { application: { include: { divisi: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.user.count({ where: { role: "PESERTA" } }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div>
@@ -73,6 +89,12 @@ export default async function AdminPesertaPage() {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        buildHref={(p) => (p > 1 ? `/admin/peserta?page=${p}` : "/admin/peserta")}
+      />
     </div>
   );
 }

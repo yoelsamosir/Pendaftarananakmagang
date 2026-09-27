@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { hoursAgo } from "@/lib/time";
 import DashboardShell from "@/components/DashboardShell";
 
 export default async function AdminLayout({
@@ -13,9 +14,12 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  const pengajuanBaru = await prisma.application.count({
-    where: { status: "DIAJUKAN" },
-  });
+  const [pengajuanBaru, errorCount24h] = await Promise.all([
+    prisma.application.count({ where: { status: "DIAJUKAN" } }),
+    prisma.errorLog.count({
+      where: { createdAt: { gte: hoursAgo(24) } },
+    }),
+  ]);
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: "🏠" },
@@ -31,6 +35,12 @@ export default async function AdminLayout({
     { href: "/admin/surat", label: "Surat", icon: "✉️" },
     { href: "/admin/penyelesaian", label: "Penyelesaian Magang", icon: "📝" },
     { href: "/admin/email-log", label: "Email Log", icon: "📧" },
+    {
+      href: "/admin/error-log",
+      label: "Error Log",
+      icon: "🐞",
+      badge: errorCount24h,
+    },
     { href: "/admin/pengaturan", label: "Pengaturan", icon: "⚙️" },
     { href: "/admin/audit-log", label: "Audit Log", icon: "🔐" },
   ];

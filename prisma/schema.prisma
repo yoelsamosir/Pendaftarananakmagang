@@ -201,3 +201,26 @@ model AuditLog {
   after      String?
   createdAt  DateTime @default(now())
 }
+
+// Jendela geser sederhana berbasis DB untuk rate limiting endpoint publik
+// (pendaftaran, cek status). Baris lama dibersihkan otomatis saat dicek.
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+// Log error tak tertangani dari API route untuk dipantau admin, sebagai
+// pengganti ringan layanan monitoring pihak ketiga.
+model ErrorLog {
+  id        String   @id @default(cuid())
+  message   String
+  stack     String?
+  path      String?
+  method    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

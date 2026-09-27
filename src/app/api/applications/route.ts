@@ -10,9 +10,31 @@ import {
 import { sendNotificationEmail } from "@/lib/email";
 import { writeAuditLog } from "@/lib/audit";
 import { INSTANSI_NAME } from "@/lib/constants";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { detectDocumentType } from "@/lib/fileSignature";
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
+
+  // Honeypot: field ini disembunyikan dari pengguna asli lewat CSS, bot
+  // pengisi form otomatis biasanya tetap mengisinya. Balas seolah sukses
+  // (tanpa memproses apa pun) supaya bot tidak mendapat sinyal terdeteksi.
+  const honeypot = formData.get("website");
+  if (typeof honeypot === "string" && honeypot.trim() !== "") {
+    return NextResponse.json(
+      { nomorPengajuan: "MAG-0000-0000", id: "ignored" },
+      { status: 201 }
+    );
+  }
+
+  const ip = getClientIp(req);
+  const ipOk = await checkRateLimit(`daftar:ip:${ip}`, 5, 60 * 60 * 1000);
+  if (!ipOk) {
+    return NextResponse.json(
+      { error: "Terlalu banyak percobaan pendaftaran. Coba lagi dalam 1 jam." },
+      { status: 429 }
+    );
+  }
 
   const raw = Object.fromEntries(formData.entries());
   const parsed = applicationSchema.safeParse(raw);
@@ -23,6 +45,21 @@ export async function POST(req: NextRequest) {
     );
   }
   const data = parsed.data;
+
+  const emailOk = await checkRateLimit(
+    `daftar:email:${data.email.toLowerCase()}`,
+    3,
+    24 * 60 * 60 * 1000
+  );
+  if (!emailOk) {
+    return NextResponse.json(
+      {
+        error:
+          "Email ini sudah mengirim beberapa pengajuan hari ini. Coba lagi besok, atau cek status pengajuan sebelumnya.",
+      },
+      { status: 429 }
+    );
+  }
 
   const mulai = new Date(data.rencanaMulai);
   const selesai = new Date(data.rencanaSelesai);
@@ -71,6 +108,13 @@ export async function POST(req: NextRequest) {
     if (!ALLOWED_DOC_TYPES.includes(f.type)) {
       return NextResponse.json(
         { error: `${label} harus berformat PDF atau Word` },
+        { status: 400 }
+      );
+    }
+    const detected = await detectDocumentType(f);
+    if (!detected) {
+      return NextResponse.json(
+        { error: `${label} bukan berkas PDF atau Word yang valid` },
         { status: 400 }
       );
     }

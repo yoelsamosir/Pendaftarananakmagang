@@ -103,6 +103,22 @@ export default function DaftarPage() {
         )}
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-10">
+          {/* Honeypot anti-bot: disembunyikan dari pengguna asli lewat CSS,
+              tidak pakai display:none/hidden agar tidak mudah dideteksi bot. */}
+          <div
+            aria-hidden="true"
+            className="absolute left-[-9999px] top-auto h-0 w-0 overflow-hidden"
+          >
+            <label htmlFor="website">Jangan isi kolom ini</label>
+            <input
+              id="website"
+              name="website"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
           <fieldset className="space-y-4">
             <legend className="text-base font-semibold text-stone-900">
               1. Data Pribadi

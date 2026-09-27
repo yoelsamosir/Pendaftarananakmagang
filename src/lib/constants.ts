@@ -1,4 +1,5 @@
 export const INSTANSI_NAME = "Balai Layanan Perpustakaan";
+export const INSTANSI_EMAIL_RESMI = "balaiyanpus@jogjaprov.go.id";
 export const INSTANSI_FULL =
   "Balai Layanan Perpustakaan, Dinas Perpustakaan dan Arsip Daerah DIY";
 

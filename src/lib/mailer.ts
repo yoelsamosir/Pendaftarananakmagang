@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { INSTANSI_EMAIL_RESMI } from "./constants";
 
 let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
 
@@ -23,6 +24,7 @@ export async function sendMail(params: { to: string; subject: string; text: stri
 
   await getTransporter().sendMail({
     from: `"Sistem Magang Balai Layanan Perpustakaan" <${from}>`,
+    replyTo: `"Balai Layanan Perpustakaan" <${INSTANSI_EMAIL_RESMI}>`,
     to: params.to,
     subject: params.subject,
     text: params.text,

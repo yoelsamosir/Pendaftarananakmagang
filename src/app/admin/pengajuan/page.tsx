@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ApplicationStatusBadge } from "@/components/StatusBadge";
+import Pagination from "@/components/Pagination";
 import { Prisma, ApplicationStatus } from "@prisma/client";
 
 const statusFilters: { value: ApplicationStatus | ""; label: string }[] = [
@@ -12,14 +13,17 @@ const statusFilters: { value: ApplicationStatus | ""; label: string }[] = [
   { value: "DITOLAK", label: "Ditolak" },
 ];
 
+const PAGE_SIZE = 20;
+
 export default async function AdminPengajuanPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; q?: string }>;
+  searchParams: Promise<{ status?: string; q?: string; page?: string }>;
 }) {
   const params = await searchParams;
   const status = params.status || "";
   const q = params.q?.trim();
+  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
 
   const where: Prisma.ApplicationWhereInput = {};
   if (status) where.status = status as ApplicationStatus;
@@ -32,11 +36,26 @@ export default async function AdminPengajuanPage({
     ];
   }
 
-  const applications = await prisma.application.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    include: { divisi: true },
-  });
+  const [applications, total] = await Promise.all([
+    prisma.application.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      include: { divisi: true },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.application.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const buildHref = (p: number) => {
+    const sp = new URLSearchParams();
+    if (status) sp.set("status", status);
+    if (q) sp.set("q", q);
+    if (p > 1) sp.set("page", String(p));
+    const qs = sp.toString();
+    return qs ? `/admin/pengajuan?${qs}` : "/admin/pengajuan";
+  };
 
   return (
     <div>
@@ -110,6 +129,8 @@ export default async function AdminPengajuanPage({
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
     </div>
   );
 }
