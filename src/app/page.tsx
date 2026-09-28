@@ -97,9 +97,10 @@ export default function HomePage() {
             Pemda DIY
           </h1>
           <p className="mt-4 max-w-2xl text-stone-600">
-            Ajukan permohonan magang secara online, pantau status pengajuan,
-            dan kelola seluruh dokumen serta jadwal magang Anda dalam satu
-            sistem terpadu.
+            Pendaftaran magang kini dilakukan sepenuhnya secara online
+            melalui website ini — isi formulir, unggah dokumen, pantau
+            status pengajuan, dan kelola seluruh dokumen serta jadwal
+            magang Anda dalam satu sistem terpadu.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
