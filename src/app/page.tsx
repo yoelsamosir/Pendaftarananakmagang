@@ -30,7 +30,7 @@ const layananInfo = [
     uraian: [
       "Mengirimkan surat izin/permohonan magang dan draft proposal magang (serta pedoman magang dari kampus/sekolah/instansi masing-masing, jika ada).",
       "Surat ditujukan kepada Kepala Balai Layanan Perpustakaan, Gedung Grhatama Pustaka, Jl. Janti, Banguntapan, Bantul.",
-      "Pengiriman melalui email balaiyanpus@jogjaprov.go.id atau datang langsung ke Gedung Grhatama Pustaka.",
+      "Pengiriman dilakukan secara online melalui website ini (isi formulir pendaftaran dan unggah dokumen pada halaman Daftar Magang).",
       "Konfirmasi melalui WhatsApp 0881-2658-192.",
       "Surat dikirim paling lambat 14 hari sebelum pelaksanaan magang.",
     ],

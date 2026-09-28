@@ -4,6 +4,7 @@ import { useEffect, useState, FormEvent } from "react";
 import Link from "next/link";
 import PublicNavbar from "@/components/PublicNavbar";
 import DatePickerField from "@/components/DatePickerField";
+import { minRencanaMulaiDate, MIN_DAYS_BEFORE_MULAI } from "@/lib/internshipRules";
 
 type Division = { id: string; name: string };
 
@@ -179,7 +180,7 @@ export default function DaftarPage() {
                 label="Rencana Mulai"
                 name="rencanaMulai"
                 required
-                minDate={new Date()}
+                minDate={minRencanaMulaiDate()}
               />
               <DatePickerField
                 label="Rencana Selesai"
@@ -189,6 +190,11 @@ export default function DaftarPage() {
               />
               <Field label="Durasi" name="durasi" placeholder="mis. 2 bulan" />
             </div>
+            <p className="text-xs text-stone-500">
+              Rencana mulai magang minimal {MIN_DAYS_BEFORE_MULAI} hari dari
+              hari ini, agar admin memiliki waktu untuk memverifikasi
+              pengajuan Anda.
+            </p>
             <Field label="Catatan Tambahan" name="catatan" textarea />
           </fieldset>
 
