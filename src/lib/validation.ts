@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PASSWORD_RULES } from "./passwordRules";
 
 export const applicationSchema = z.object({
   namaLengkap: z.string().min(3, "Nama lengkap wajib diisi"),
@@ -34,13 +35,12 @@ export const loginSchema = z.object({
 });
 
 // Dipakai untuk password baru (bukan login) — cukup kuat untuk akun admin
-// maupun peserta: minimal 8 karakter, kombinasi huruf besar/kecil dan angka.
-const strongPassword = z
-  .string()
-  .min(8, "Password minimal 8 karakter")
-  .regex(/[a-z]/, "Password harus mengandung huruf kecil")
-  .regex(/[A-Z]/, "Password harus mengandung huruf besar")
-  .regex(/[0-9]/, "Password harus mengandung angka");
+// maupun peserta. Aturannya sendiri didefinisikan sekali di lib/passwordRules.ts
+// (dipakai juga oleh checklist di client) supaya tidak ada dua sumber kebenaran.
+const strongPassword = PASSWORD_RULES.reduce(
+  (schema, rule) => schema.refine(rule.test, `Password harus: ${rule.message.toLowerCase()}`),
+  z.string()
+);
 
 export const setupPasswordSchema = z
   .object({
@@ -69,5 +69,10 @@ export const updateProfileSchema = z.object({
 });
 
 export const forgotPasswordSchema = z.object({
+  email: z.string().email("Format email tidak valid"),
+});
+
+export const lengkapiBerkasSchema = z.object({
+  nomor: z.string().min(1, "Nomor pengajuan wajib diisi"),
   email: z.string().email("Format email tidak valid"),
 });

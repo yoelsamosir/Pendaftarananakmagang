@@ -43,3 +43,15 @@ export const DOCUMENT_TYPE_LABEL: Record<string, string> = {
   SURAT_KETERANGAN_SELESAI: "Surat Keterangan Telah Selesai Magang",
   LAINNYA: "Dokumen Lainnya",
 };
+
+// Jenis dokumen yang diunggah pelamar saat pendaftaran awal — satu-satunya
+// yang boleh ditandai admin sebagai "kurang/perlu diperbaiki" dan yang bisa
+// dilengkapi ulang pelamar lewat /status (lihat dokumenPerluDiperbaiki di
+// skema Application). Surat penerimaan & keterangan selesai digenerate
+// sistem, bukan diunggah pelamar, sehingga tidak termasuk di sini.
+export const PENGAJUAN_DOCUMENT_TYPES = ["SURAT_PERMOHONAN", "PROPOSAL", "PEDOMAN"] as const;
+
+export const REJECTION_CATEGORY_LABEL: Record<string, string> = {
+  KUOTA_PENUH: "Kuota Penuh",
+  LAINNYA: "Lainnya",
+};

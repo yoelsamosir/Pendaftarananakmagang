@@ -18,6 +18,33 @@ export default async function AdminPengajuanDetailPage({
 
   if (!application) notFound();
 
+  // Cek dulu apakah email pemohon sudah dipakai akun lain, supaya admin bisa
+  // diperingatkan SEBELUM klik "Terima" (decision route menolak reuse akun
+  // non-PESERTA, dan reuse akun PESERTA lama tetap diizinkan tapi perlu
+  // disadari admin — lihat DecisionPanel & QA findings bug #7).
+  let existingAccountNote: { tone: "conflict" | "info"; message: string } | null = null;
+  if (application.status === "DIAJUKAN") {
+    const existingProfile = await prisma.user.findUnique({
+      where: { email: application.email },
+    });
+    if (existingProfile && existingProfile.role !== "PESERTA") {
+      existingAccountNote = {
+        tone: "conflict",
+        message: `Email ini sudah terdaftar sebagai akun ${existingProfile.role} di sistem. Menerima pengajuan ini akan DITOLAK otomatis oleh sistem sampai konfliknya diselesaikan (misalnya minta pemohon memakai email lain).`,
+      };
+    } else if (existingProfile && existingProfile.applicationId && existingProfile.applicationId !== id) {
+      existingAccountNote = {
+        tone: "conflict",
+        message: "Email ini sudah terdaftar pada akun peserta lain (terhubung ke pengajuan berbeda).",
+      };
+    } else if (existingProfile) {
+      existingAccountNote = {
+        tone: "info",
+        message: `Email ini sudah punya akun peserta dari pengajuan sebelumnya (belum terhubung ke pengajuan manapun saat ini). Menerima pengajuan ini akan memakai ulang akun tersebut, bukan membuat akun baru.`,
+      };
+    }
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="space-y-6 lg:col-span-2">
@@ -156,6 +183,7 @@ export default async function AdminPengajuanDetailPage({
               ? application.tanggalSuratAsal.toISOString().slice(0, 10)
               : null
           }
+          existingAccountNote={existingAccountNote}
         />
       </div>
     </div>

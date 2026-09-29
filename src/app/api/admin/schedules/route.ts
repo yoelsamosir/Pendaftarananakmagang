@@ -32,12 +32,27 @@ export async function POST(req: NextRequest) {
   }
 
   // Cegah bentrokan: satu ruangan hanya untuk satu peserta pada tanggal yang sama.
-  const conflict = await prisma.roomSchedule.findFirst({
+  const roomConflict = await prisma.roomSchedule.findFirst({
     where: { roomId, date: parsedDate },
   });
-  if (conflict) {
+  if (roomConflict) {
     return NextResponse.json(
       { error: "Ruangan sudah digunakan peserta lain pada tanggal tersebut" },
+      { status: 409 }
+    );
+  }
+
+  // Cegah bentrokan sebaliknya: satu peserta tidak boleh dijadwalkan ke dua
+  // ruangan berbeda pada tanggal yang sama.
+  const userConflict = await prisma.roomSchedule.findFirst({
+    where: { userId, date: parsedDate },
+    include: { room: true },
+  });
+  if (userConflict) {
+    return NextResponse.json(
+      {
+        error: `Peserta ini sudah dijadwalkan di ${userConflict.room.name} pada tanggal tersebut`,
+      },
       { status: 409 }
     );
   }

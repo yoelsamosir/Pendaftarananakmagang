@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { getUnmetPasswordRules } from "@/lib/passwordRules";
 
 export default function AccountSettingsForm() {
   const router = useRouter();
@@ -15,6 +16,10 @@ export default function AccountSettingsForm() {
   const [savingPassword, setSavingPassword] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const unmetPasswordRules = getUnmetPasswordRules(newPassword);
+  const newPasswordsMatch = newPassword.length > 0 && newPassword === confirmNewPassword;
 
   useEffect(() => {
     fetch("/api/account/profile")
@@ -69,6 +74,8 @@ export default function AccountSettingsForm() {
       if (!res.ok) throw new Error(json.error || "Gagal mengubah password");
       setPasswordMessage("Password berhasil diubah");
       form.reset();
+      setNewPassword("");
+      setConfirmNewPassword("");
     } catch (err) {
       setPasswordError(err instanceof Error ? err.message : "Terjadi kesalahan");
     } finally {
@@ -153,10 +160,20 @@ export default function AccountSettingsForm() {
             <input
               name="newPassword"
               type="password"
-              minLength={8}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
               required
               className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
             />
+            {newPassword.length > 0 && unmetPasswordRules.length > 0 && (
+              <ul className="mt-2 space-y-0.5 text-xs text-stone-500">
+                {unmetPasswordRules.map((rule) => (
+                  <li key={rule.message} className="text-red-600">
+                    &bull; {rule.message}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-stone-700">
@@ -165,14 +182,20 @@ export default function AccountSettingsForm() {
             <input
               name="confirmPassword"
               type="password"
-              minLength={8}
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
               required
               className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
             />
+            {confirmNewPassword.length > 0 && !newPasswordsMatch && (
+              <p className="mt-2 text-xs text-red-600">Konfirmasi password tidak sama</p>
+            )}
           </div>
           <button
             type="submit"
-            disabled={savingPassword}
+            disabled={
+              savingPassword || unmetPasswordRules.length > 0 || !newPasswordsMatch
+            }
             className="rounded-md bg-red-800 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-900 disabled:opacity-60"
           >
             {savingPassword ? "Menyimpan..." : "Ubah Password"}

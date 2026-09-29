@@ -7,6 +7,8 @@ import { generateSuratPenerimaanPdf } from "@/lib/pdf";
 import { saveGeneratedFile } from "@/lib/storage";
 import { sendNotificationEmail } from "@/lib/email";
 import { writeAuditLog } from "@/lib/audit";
+import { requireAwaitingDecision } from "@/lib/decisionGuard";
+import { DOCUMENT_TYPE_LABEL, PENGAJUAN_DOCUMENT_TYPES } from "@/lib/constants";
 import { randomBytes } from "crypto";
 
 export async function POST(
@@ -24,6 +26,13 @@ export async function POST(
   const alasanTolak: string | undefined = body?.alasanTolak;
   const nomorSuratAsal: string | undefined = body?.nomorSuratAsal;
   const tanggalSuratAsal: string | undefined = body?.tanggalSuratAsal;
+  const alasanTolakKategori: "KUOTA_PENUH" | "LAINNYA" =
+    body?.alasanTolakKategori === "KUOTA_PENUH" ? "KUOTA_PENUH" : "LAINNYA";
+  const dokumenPerluDiperbaiki: string[] = Array.isArray(body?.dokumenPerluDiperbaiki)
+    ? body.dokumenPerluDiperbaiki.filter((t: unknown) =>
+        (PENGAJUAN_DOCUMENT_TYPES as readonly string[]).includes(t as string)
+      )
+    : [];
 
   if (!decision) {
     return NextResponse.json({ error: "Keputusan wajib diisi" }, { status: 400 });
@@ -37,6 +46,9 @@ export async function POST(
     return NextResponse.json({ error: "Pengajuan tidak ditemukan" }, { status: 404 });
   }
 
+  const statusGuard = requireAwaitingDecision(application.status, "Pengajuan");
+  if ("error" in statusGuard) return statusGuard.error;
+
   const beforeStatus = application.status;
 
   if (decision === "TOLAK") {
@@ -45,18 +57,23 @@ export async function POST(
       data: {
         status: "DITOLAK",
         alasanTolak: alasanTolak || null,
+        alasanTolakKategori,
         catatanAdmin: catatanAdmin || null,
         decidedAt: new Date(),
         decidedById: session.userId,
       },
     });
 
+    const kuotaMessage =
+      "Mohon maaf, kuota/posisi magang untuk periode ini sudah penuh. Anda dapat mendaftar kembali untuk periode magang berikutnya.";
+    const genericMessage = `Mohon maaf, pengajuan magang Anda dengan nomor ${application.nomorPengajuan} belum dapat kami terima. ${
+      alasanTolak ? `Alasan: ${alasanTolak}` : ""
+    }`;
+
     await sendNotificationEmail({
       to: application.email,
       subject: `Status Pengajuan Magang - ${application.nomorPengajuan}`,
-      body: `Mohon maaf, pengajuan magang Anda dengan nomor ${application.nomorPengajuan} belum dapat kami terima. ${
-        alasanTolak ? `Alasan: ${alasanTolak}` : ""
-      }`,
+      body: alasanTolakKategori === "KUOTA_PENUH" ? kuotaMessage : genericMessage,
       type: "PENGAJUAN_DITOLAK",
       applicationId: application.id,
     });
@@ -68,7 +85,7 @@ export async function POST(
       entityType: "Application",
       entityId: id,
       before: { status: beforeStatus },
-      after: { status: "DITOLAK", alasanTolak },
+      after: { status: "DITOLAK", alasanTolak, alasanTolakKategori },
     });
 
     return NextResponse.json({ ok: true, status: "DITOLAK" });
@@ -80,17 +97,22 @@ export async function POST(
       data: {
         status: "PERLU_PERBAIKAN",
         catatanAdmin: catatanAdmin || null,
+        dokumenPerluDiperbaiki,
         decidedAt: new Date(),
         decidedById: session.userId,
       },
     });
 
+    const daftarDokumen = dokumenPerluDiperbaiki
+      .map((t) => `- ${DOCUMENT_TYPE_LABEL[t] ?? t}`)
+      .join("\n");
+
     await sendNotificationEmail({
       to: application.email,
       subject: `Perlu Perbaikan Pengajuan Magang - ${application.nomorPengajuan}`,
-      body: `Pengajuan magang Anda dengan nomor ${application.nomorPengajuan} memerlukan perbaikan. ${
-        catatanAdmin ? `Catatan: ${catatanAdmin}` : ""
-      }`,
+      body: `Pengajuan magang Anda dengan nomor ${application.nomorPengajuan} memerlukan perbaikan. Anda TIDAK perlu mendaftar ulang — cukup lengkapi berkas berikut melalui halaman Cek Status pada website kami:\n${
+        daftarDokumen || "(lihat catatan admin di bawah)"
+      }${catatanAdmin ? `\n\nCatatan tambahan: ${catatanAdmin}` : ""}`,
       type: "PENGAJUAN_PERLU_PERBAIKAN",
       applicationId: application.id,
     });
@@ -102,7 +124,7 @@ export async function POST(
       entityType: "Application",
       entityId: id,
       before: { status: beforeStatus },
-      after: { status: "PERLU_PERBAIKAN", catatanAdmin },
+      after: { status: "PERLU_PERBAIKAN", catatanAdmin, dokumenPerluDiperbaiki },
     });
 
     return NextResponse.json({ ok: true, status: "PERLU_PERBAIKAN" });
@@ -112,6 +134,18 @@ export async function POST(
   const existingProfile = await prisma.user.findUnique({
     where: { email: application.email },
   });
+  // Email pemohon bisa kebetulan sama dengan email akun yang sudah ada di
+  // sistem (misalnya akun admin) — akun non-PESERTA tidak boleh pernah dipakai
+  // ulang untuk pengajuan magang, apa pun keadaan applicationId-nya, supaya
+  // pemohon tidak bisa mengambil alih akun tersebut lewat tautan setup password.
+  if (existingProfile && existingProfile.role !== "PESERTA") {
+    return NextResponse.json(
+      {
+        error: `Email ini sudah terdaftar sebagai akun ${existingProfile.role} di sistem dan tidak bisa dipakai untuk akun peserta. Selesaikan konflik ini secara manual (misalnya minta pemohon memakai email lain) sebelum menerima pengajuan ini.`,
+      },
+      { status: 409 }
+    );
+  }
   if (existingProfile && existingProfile.applicationId && existingProfile.applicationId !== id) {
     return NextResponse.json(
       { error: "Email ini sudah terdaftar pada akun peserta lain" },
@@ -252,7 +286,11 @@ export async function POST(
     entityType: "Application",
     entityId: id,
     before: { status: beforeStatus },
-    after: { status: "DITERIMA", nomorSurat },
+    after: {
+      status: "DITERIMA",
+      nomorSurat,
+      reusedExistingProfile: Boolean(existingProfile),
+    },
   });
 
   return NextResponse.json({

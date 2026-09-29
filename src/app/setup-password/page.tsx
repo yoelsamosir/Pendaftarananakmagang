@@ -3,6 +3,7 @@
 import { FormEvent, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PublicNavbar from "@/components/PublicNavbar";
+import { getUnmetPasswordRules } from "@/lib/passwordRules";
 
 function SetupPasswordForm() {
   const router = useRouter();
@@ -12,6 +13,11 @@ function SetupPasswordForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const unmetRules = getUnmetPasswordRules(password);
+  const passwordsMatch = password.length > 0 && password === confirmPassword;
+  const canSubmit = unmetRules.length === 0 && passwordsMatch;
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -75,10 +81,20 @@ function SetupPasswordForm() {
           <input
             name="password"
             type="password"
-            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
             className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
           />
+          {password.length > 0 && unmetRules.length > 0 && (
+            <ul className="mt-2 space-y-0.5 text-xs text-stone-500">
+              {unmetRules.map((rule) => (
+                <li key={rule.message} className="text-red-600">
+                  &bull; {rule.message}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-stone-700">
@@ -87,14 +103,18 @@ function SetupPasswordForm() {
           <input
             name="confirmPassword"
             type="password"
-            minLength={8}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             required
             className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
           />
+          {confirmPassword.length > 0 && !passwordsMatch && (
+            <p className="mt-2 text-xs text-red-600">Konfirmasi password tidak sama</p>
+          )}
         </div>
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !canSubmit}
           className="w-full rounded-md bg-red-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-red-900 disabled:opacity-60"
         >
           {loading ? "Menyimpan..." : "Simpan Password"}

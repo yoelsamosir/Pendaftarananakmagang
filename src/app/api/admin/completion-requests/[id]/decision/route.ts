@@ -6,6 +6,7 @@ import { generateSuratSelesaiPdf } from "@/lib/pdf";
 import { saveGeneratedFile } from "@/lib/storage";
 import { sendNotificationEmail } from "@/lib/email";
 import { writeAuditLog } from "@/lib/audit";
+import { requireAwaitingDecision } from "@/lib/decisionGuard";
 
 export async function POST(
   req: NextRequest,
@@ -31,6 +32,9 @@ export async function POST(
   if (!request) {
     return NextResponse.json({ error: "Pengajuan selesai tidak ditemukan" }, { status: 404 });
   }
+
+  const statusGuard = requireAwaitingDecision(request.status, "Pengajuan penyelesaian magang");
+  if ("error" in statusGuard) return statusGuard.error;
 
   await prisma.completionRequest.update({
     where: { id },

@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
+import { getUnmetPasswordRules } from "../src/lib/passwordRules";
 
 const prisma = new PrismaClient();
 
@@ -21,8 +22,25 @@ async function findAuthUserByEmail(email: string) {
 }
 
 async function main() {
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@balailayananperpustakaan.go.id";
-  const adminPassword = process.env.ADMIN_PASSWORD || "Admin123!";
+  // Tidak ada fallback ke email/password default -- default yang sama di
+  // setiap instalasi (dan sekarang publik di riwayat repo) adalah celah nyata
+  // kalau env var lupa diset saat deploy pertama kali. Wajibkan operator
+  // mengisi keduanya secara sadar, dan tolak password yang lemah.
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminEmail || !adminPassword) {
+    throw new Error(
+      "ADMIN_EMAIL dan ADMIN_PASSWORD wajib diset di .env sebelum menjalankan seed -- tidak ada default."
+    );
+  }
+  const unmetRules = getUnmetPasswordRules(adminPassword);
+  if (unmetRules.length > 0) {
+    throw new Error(
+      `ADMIN_PASSWORD terlalu lemah. Syarat yang belum terpenuhi: ${unmetRules
+        .map((r) => r.message)
+        .join(", ")}.`
+    );
+  }
 
   let authUser = await findAuthUserByEmail(adminEmail);
   if (!authUser) {
@@ -34,7 +52,7 @@ async function main() {
     });
     if (error || !data.user) throw new Error(`Gagal membuat admin: ${error?.message}`);
     authUser = data.user;
-    console.log(`Admin dibuat di Supabase Auth: ${adminEmail} / ${adminPassword}`);
+    console.log(`Admin dibuat di Supabase Auth: ${adminEmail} (password tidak ditampilkan di log)`);
   } else {
     console.log("Admin sudah ada di Supabase Auth, dilewati.");
   }
