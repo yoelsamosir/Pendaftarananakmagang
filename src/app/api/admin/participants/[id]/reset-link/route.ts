@@ -15,7 +15,11 @@ export async function POST(
 
   const { id } = await params;
   const participant = await prisma.user.findUnique({ where: { id } });
-  if (!participant) {
+  // "id" berasal dari URL dan bisa jadi ID akun mana pun yang ada di tabel
+  // User -- tanpa cek role ini, tool yang seharusnya khusus peserta bisa
+  // dipakai untuk membuat link reset password akun ADMIN lain (bukan cuma
+  // akun peserta), yang sama sekali di luar tujuan endpoint ini.
+  if (!participant || participant.role !== "PESERTA") {
     return NextResponse.json({ error: "Peserta tidak ditemukan" }, { status: 404 });
   }
 

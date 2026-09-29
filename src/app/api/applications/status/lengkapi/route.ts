@@ -31,6 +31,19 @@ export async function POST(req: NextRequest) {
   }
   const { nomor, email } = parsed.data;
 
+  // Selain per-IP di atas, batasi juga per-nomor-pengajuan: endpoint ini
+  // MENULIS data (bukan cuma membaca seperti GET /status) hanya berdasarkan
+  // nomor+email, dan nomor pengajuan formatnya pendek & berurut (mudah
+  // ditebak) -- tanpa ini, satu nomor yang diketahui bisa "diserang" dari
+  // banyak IP berbeda untuk mencoba menebak email yang benar.
+  const nomorOk = await checkRateLimit(`lengkapi:nomor:${nomor}`, 5, 60 * 60 * 1000);
+  if (!nomorOk) {
+    return NextResponse.json(
+      { error: "Terlalu banyak percobaan untuk nomor pengajuan ini. Coba lagi dalam 1 jam." },
+      { status: 429 }
+    );
+  }
+
   const application = await prisma.application.findFirst({
     where: { nomorPengajuan: nomor, email: { equals: email.toLowerCase() } },
   });
@@ -54,8 +67,17 @@ export async function POST(req: NextRequest) {
     { field: "dokumen_pedoman", type: "PEDOMAN", label: "Pedoman Magang" },
   ];
 
+  // Kalau admin sudah menandai dokumen mana yang kurang (checklist di
+  // DecisionPanel), hanya dokumen itu yang diterima di sini, dan SEMUANYA
+  // wajib diunggah — supaya pelamar tidak bisa "lolos review ulang" dengan
+  // upload dokumen lain yang tidak diminta sementara yang benar-benar kurang
+  // tetap belum dilengkapi. Kalau admin belum pernah pakai checklist (data
+  // lama, cuma catatan bebas), fallback ke perilaku lama: terima salah satu.
+  const flagged = application.dokumenPerluDiperbaiki;
+  const relevantFields = flagged.length > 0 ? fields.filter((f) => flagged.includes(f.type)) : fields;
+
   const uploaded: { file: File; type: string }[] = [];
-  for (const { field, type, label } of fields) {
+  for (const { field, type, label } of relevantFields) {
     const file = formData.get(field) as File | null;
     if (!file || file.size === 0) continue;
     if (file.size > MAX_FILE_SIZE) {
@@ -78,6 +100,18 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (flagged.length > 0) {
+    const uploadedTypes = new Set(uploaded.map((u) => u.type));
+    const missing = flagged.filter((t) => !uploadedTypes.has(t));
+    if (missing.length > 0) {
+      const labels = missing.map((t) => fields.find((f) => f.type === t)?.label ?? t);
+      return NextResponse.json(
+        { error: `Masih ada dokumen yang wajib dilengkapi: ${labels.join(", ")}` },
+        { status: 400 }
+      );
+    }
+  }
+
   for (const { file, type } of uploaded) {
     const saved = await saveUploadedFile(file, `pengajuan/${application.id}`);
     await prisma.document.create({
@@ -93,10 +127,18 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  await prisma.application.update({
-    where: { id: application.id },
+  // Klaim atomik, sama seperti endpoint keputusan admin -- cegah dua submit
+  // bersamaan dari pelamar yang sama sama-sama lolos dan dobel proses.
+  const claim = await prisma.application.updateMany({
+    where: { id: application.id, status: "PERLU_PERBAIKAN" },
     data: { status: "DIAJUKAN", dokumenPerluDiperbaiki: [] },
   });
+  if (claim.count === 0) {
+    return NextResponse.json(
+      { error: "Pengajuan ini baru saja diproses. Coba cek status lagi." },
+      { status: 409 }
+    );
+  }
 
   await sendNotificationEmail({
     to: application.email,

@@ -155,6 +155,12 @@ model RoomSchedule {
   date   DateTime
 
   createdAt DateTime @default(now())
+
+  // Menutup race condition di level database: cek konflik di route.ts
+  // (findFirst lalu create) masih rawan TOCTOU kalau dua request dieksekusi
+  // benar-benar bersamaan -- constraint ini yang jadi jaminan akhir.
+  @@unique([roomId, date])
+  @@unique([userId, date])
 }
 
 model CompletionRequest {

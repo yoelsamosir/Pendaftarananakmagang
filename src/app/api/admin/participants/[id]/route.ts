@@ -20,7 +20,7 @@ export async function GET(
     },
   });
 
-  if (!participant) {
+  if (!participant || participant.role !== "PESERTA") {
     return NextResponse.json({ error: "Peserta tidak ditemukan" }, { status: 404 });
   }
 

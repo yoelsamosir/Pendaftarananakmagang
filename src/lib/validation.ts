@@ -1,21 +1,27 @@
 import { z } from "zod";
 import { PASSWORD_RULES } from "./passwordRules";
 
+// Dipakai di form pendaftaran awal maupun saat peserta mengedit data sendiri
+// (participant/me) supaya keduanya konsisten -- sebelumnya PATCH data peserta
+// tidak divalidasi sama sekali, jadi format nomor telepon bisa dilewati.
+const teleponSchema = z
+  .string()
+  .min(9, "Nomor telepon tidak valid")
+  .max(20, "Nomor telepon terlalu panjang")
+  .regex(/^[0-9+\-\s]+$/, "Nomor telepon tidak valid");
+
 export const applicationSchema = z.object({
-  namaLengkap: z.string().min(3, "Nama lengkap wajib diisi"),
+  namaLengkap: z.string().min(3, "Nama lengkap wajib diisi").max(200),
   email: z.string().email("Format email tidak valid"),
-  telepon: z
-    .string()
-    .min(9, "Nomor telepon tidak valid")
-    .regex(/^[0-9+\-\s]+$/, "Nomor telepon tidak valid"),
-  alamat: z.string().optional(),
+  telepon: teleponSchema,
+  alamat: z.string().max(500).optional(),
   tanggalLahir: z.string().optional(),
 
-  institusi: z.string().min(2, "Institusi wajib diisi"),
-  fakultas: z.string().optional(),
-  programStudi: z.string().optional(),
-  nimNis: z.string().optional(),
-  semesterKelas: z.string().optional(),
+  institusi: z.string().min(2, "Institusi wajib diisi").max(200),
+  fakultas: z.string().max(200).optional(),
+  programStudi: z.string().max(200).optional(),
+  nimNis: z.string().max(50).optional(),
+  semesterKelas: z.string().max(50).optional(),
 
   jenisMagang: z.string().optional(),
   rencanaMulai: z.string().min(1, "Rencana mulai wajib diisi"),
@@ -65,7 +71,16 @@ export const changePasswordSchema = z
   });
 
 export const updateProfileSchema = z.object({
-  name: z.string().min(3, "Nama minimal 3 karakter"),
+  name: z.string().min(3, "Nama minimal 3 karakter").max(100, "Nama terlalu panjang"),
+});
+
+export const updateParticipantDataSchema = z.object({
+  telepon: teleponSchema.optional(),
+  alamat: z.string().max(500).optional().nullable(),
+  fakultas: z.string().max(200).optional().nullable(),
+  programStudi: z.string().max(200).optional().nullable(),
+  nimNis: z.string().max(50).optional().nullable(),
+  semesterKelas: z.string().max(50).optional().nullable(),
 });
 
 export const forgotPasswordSchema = z.object({

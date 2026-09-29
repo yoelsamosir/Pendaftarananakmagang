@@ -19,7 +19,9 @@ export async function PATCH(
   }
 
   const participant = await prisma.user.findUnique({ where: { id } });
-  if (!participant) {
+  // Sama seperti reset-link: tanpa cek role ini, endpoint "peserta" ini bisa
+  // dipakai untuk mem-ban/unban akun ADMIN lain lewat Supabase Auth.
+  if (!participant || participant.role !== "PESERTA") {
     return NextResponse.json({ error: "Peserta tidak ditemukan" }, { status: 404 });
   }
 

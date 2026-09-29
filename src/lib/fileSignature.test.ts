@@ -11,9 +11,20 @@ describe("detectDocumentType", () => {
     expect(await detectDocumentType(file)).toBe("pdf");
   });
 
-  it("mengenali berkas DOCX (zip) dari byte PK", async () => {
-    const file = fileFromBytes([0x50, 0x4b, 0x03, 0x04, 0, 0, 0, 0]);
+  it("mengenali berkas DOCX asli (ada entry ZIP word/document.xml)", async () => {
+    const header = [0x50, 0x4b, 0x03, 0x04, 0, 0, 0, 0];
+    const marker = Array.from(new TextEncoder().encode("...word/document.xml..."));
+    const file = fileFromBytes([...header, ...marker]);
     expect(await detectDocumentType(file)).toBe("docx");
+  });
+
+  it("menolak berkas ZIP yang bukan dokumen Word (xlsx/pptx/zip biasa mengaku docx)", async () => {
+    // Byte PK di awal sama persis dengan docx -- tanpa cek entry ZIP-nya,
+    // xlsx/pptx/zip biasa yang di-rename .docx akan lolos begitu saja.
+    const header = [0x50, 0x4b, 0x03, 0x04, 0, 0, 0, 0];
+    const marker = Array.from(new TextEncoder().encode("...xl/workbook.xml..."));
+    const file = fileFromBytes([...header, ...marker], "bukan-docx.docx");
+    expect(await detectDocumentType(file)).toBeNull();
   });
 
   it("mengenali berkas DOC lama (OLE compound)", async () => {

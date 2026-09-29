@@ -16,8 +16,11 @@ export async function POST(req: NextRequest) {
   if ("error" in guard) return guard.error;
 
   const body = await req.json().catch(() => null);
-  const name = body?.name?.trim();
+  const name = typeof body?.name === "string" ? body.name.trim() : "";
   if (!name) return NextResponse.json({ error: "Nama ruangan wajib diisi" }, { status: 400 });
+  if (name.length > 100) {
+    return NextResponse.json({ error: "Nama ruangan terlalu panjang" }, { status: 400 });
+  }
 
   const room = await prisma.room.create({ data: { name } });
 

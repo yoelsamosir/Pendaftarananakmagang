@@ -57,10 +57,25 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const schedule = await prisma.roomSchedule.create({
-    data: { roomId, userId, date: parsedDate },
-    include: { room: true, user: true },
-  });
+  // Pengecekan di atas (findFirst) masih rawan TOCTOU kalau dua request
+  // dieksekusi benar-benar bersamaan -- constraint unik di skema (@@unique
+  // [roomId, date] & [userId, date]) adalah jaminan akhirnya, ditangkap di sini.
+  let schedule;
+  try {
+    schedule = await prisma.roomSchedule.create({
+      data: { roomId, userId, date: parsedDate },
+      include: { room: true, user: true },
+    });
+  } catch (err) {
+    const code = typeof err === "object" && err !== null ? (err as { code?: string }).code : undefined;
+    if (code === "P2002") {
+      return NextResponse.json(
+        { error: "Jadwal ini bentrok dengan jadwal lain yang baru saja dibuat" },
+        { status: 409 }
+      );
+    }
+    throw err;
+  }
 
   await sendNotificationEmail({
     to: schedule.user.email,

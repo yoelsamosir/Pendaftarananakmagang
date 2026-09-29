@@ -58,8 +58,12 @@ export async function POST(req: NextRequest) {
         console.error("Gagal mengirim email reset password:", err);
       }
 
+      // Token sekali-pakai TIDAK disimpan ke EmailLog (beda dari email yang
+      // benar-benar dikirim) -- lihat catatan yang sama di lib/email.ts.
+      const logText =
+        "Anda (atau seseorang) meminta reset password untuk akun ini. Tautan reset password sekali-pakai dikirim ke email (tidak disimpan di log ini).";
       await prisma.emailLog.create({
-        data: { to: email, subject, body: text, type: "RESET_PASSWORD", status },
+        data: { to: email, subject, body: logText, type: "RESET_PASSWORD", status },
       });
     }
   } catch (err) {

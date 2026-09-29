@@ -9,6 +9,12 @@ export async function sendNotificationEmail(params: {
   body: string;
   type: string;
   applicationId?: string;
+  // Isi alternatif buat disimpan ke EmailLog kalau body asli mengandung
+  // token sekali-pakai (link setup/reset password) -- emailnya sendiri
+  // tetap dikirim dengan `body` yang asli, cuma catatan di database yang
+  // diredaksi, supaya token tidak tersimpan permanen di tabel yang bisa
+  // dilihat admin lain / ikut kalau ada kebocoran backup database.
+  logBody?: string;
 }) {
   let status = "SENT";
   try {
@@ -22,7 +28,7 @@ export async function sendNotificationEmail(params: {
     data: {
       to: params.to,
       subject: params.subject,
-      body: params.body,
+      body: params.logBody ?? params.body,
       type: params.type,
       status,
       applicationId: params.applicationId,

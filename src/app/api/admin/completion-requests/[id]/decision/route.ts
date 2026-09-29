@@ -36,10 +36,17 @@ export async function POST(
   const statusGuard = requireAwaitingDecision(request.status, "Pengajuan penyelesaian magang");
   if ("error" in statusGuard) return statusGuard.error;
 
-  await prisma.completionRequest.update({
-    where: { id },
+  // Klaim atomik -- lihat catatan yang sama di applications/[id]/decision/route.ts.
+  const claim = await prisma.completionRequest.updateMany({
+    where: { id, status: "DIAJUKAN" },
     data: { status: decision, adminNote: adminNote || null, decidedAt: new Date() },
   });
+  if (claim.count === 0) {
+    return NextResponse.json(
+      { error: "Pengajuan ini baru saja diputuskan oleh proses lain." },
+      { status: 409 }
+    );
+  }
 
   await writeAuditLog({
     actorId: session.userId,
@@ -80,28 +87,30 @@ export async function POST(
     "surat-keterangan-selesai.pdf"
   );
 
-  const letter = await prisma.letter.create({
-    data: {
-      type: "SELESAI",
-      number: nomorSurat,
-      applicationId: request.applicationId,
-      userId: request.userId,
-      pdfPath,
-    },
-  });
-
-  await prisma.document.create({
-    data: {
-      category: "PENYELESAIAN",
-      type: "SURAT_KETERANGAN_SELESAI",
-      fileName: `Surat Keterangan Selesai Magang - ${request.application.namaLengkap}.pdf`,
-      storedPath: pdfPath,
-      mimeType: "application/pdf",
-      size: pdfBuffer.length,
-      applicationId: request.applicationId,
-      uploadedById: session.userId,
-    },
-  });
+  // Satu transaksi supaya letter & document tercatat bersamaan.
+  const [letter] = await prisma.$transaction([
+    prisma.letter.create({
+      data: {
+        type: "SELESAI",
+        number: nomorSurat,
+        applicationId: request.applicationId,
+        userId: request.userId,
+        pdfPath,
+      },
+    }),
+    prisma.document.create({
+      data: {
+        category: "PENYELESAIAN",
+        type: "SURAT_KETERANGAN_SELESAI",
+        fileName: `Surat Keterangan Selesai Magang - ${request.application.namaLengkap}.pdf`,
+        storedPath: pdfPath,
+        mimeType: "application/pdf",
+        size: pdfBuffer.length,
+        applicationId: request.applicationId,
+        uploadedById: session.userId,
+      },
+    }),
+  ]);
 
   await sendNotificationEmail({
     to: request.user.email,
