@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import DatePickerField from "@/components/DatePickerField";
+import DateRangePickerField from "@/components/DateRangePickerField";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 type Room = { id: string; name: string };
@@ -73,7 +73,8 @@ export default function AdminJadwalPage() {
       body: JSON.stringify({
         roomId: formData.get("roomId"),
         userId: formData.get("userId"),
-        date: formData.get("date"),
+        dateStart: formData.get("dateStart"),
+        dateEnd: formData.get("dateEnd"),
       }),
     });
     const json = await res.json();
@@ -171,7 +172,12 @@ export default function AdminJadwalPage() {
                 </option>
               ))}
             </select>
-            <DatePickerField label="Tanggal" name="date" required />
+            <DateRangePickerField
+              label="Tanggal"
+              startName="dateStart"
+              endName="dateEnd"
+              required
+            />
             <button className="w-full rounded-md bg-red-800 px-4 py-2 text-sm font-semibold text-white hover:bg-red-900">
               Tambah Jadwal
             </button>

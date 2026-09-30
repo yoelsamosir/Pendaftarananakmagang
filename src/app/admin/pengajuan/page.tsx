@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ApplicationStatusBadge } from "@/components/StatusBadge";
 import Pagination from "@/components/Pagination";
+import ClickableRow from "@/components/ClickableRow";
 import { Prisma, ApplicationStatus } from "@prisma/client";
 
 const statusFilters: { value: ApplicationStatus | ""; label: string }[] = [
@@ -107,7 +108,11 @@ export default async function AdminPengajuanPage({
               </tr>
             )}
             {applications.map((a) => (
-              <tr key={a.id} className="hover:bg-stone-50">
+              <ClickableRow
+                key={a.id}
+                href={`/admin/pengajuan/${a.id}`}
+                className="hover:bg-stone-50"
+              >
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/pengajuan/${a.id}`}
@@ -124,7 +129,7 @@ export default async function AdminPengajuanPage({
                 <td className="px-4 py-3">
                   <ApplicationStatusBadge status={a.status} />
                 </td>
-              </tr>
+              </ClickableRow>
             ))}
           </tbody>
         </table>
