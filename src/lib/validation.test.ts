@@ -12,6 +12,10 @@ describe("applicationSchema", () => {
     email: "budi@example.com",
     telepon: "081234567890",
     institusi: "Universitas Contoh",
+    fakultas: "Fakultas Ilmu Komputer",
+    programStudi: "Teknik Informatika",
+    nimNis: "12345678",
+    semesterKelas: "7",
     rencanaMulai: "2026-10-01",
     rencanaSelesai: "2026-12-01",
   };

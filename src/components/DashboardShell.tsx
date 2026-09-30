@@ -46,6 +46,22 @@ export default function DashboardShell({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // Submenu tertutup secara default -- hanya terbuka kalau baris induknya
+  // sedang aktif (sudah di halaman itu) atau admin baru mengekliknya sendiri,
+  // bukan otomatis terbuka semua setiap saat.
+  const [openHrefs, setOpenHrefs] = useState<Set<string>>(
+    () => new Set(navItems.filter((item) => item.children && isActivePath(pathname, item.href)).map((item) => item.href))
+  );
+
+  function toggleOpen(href: string) {
+    setOpenHrefs((prev) => {
+      const next = new Set(prev);
+      if (next.has(href)) next.delete(href);
+      else next.add(href);
+      return next;
+    });
+  }
+
   useEffect(() => {
     if (!pollBadge) return;
     let cancelled = false;
@@ -91,25 +107,47 @@ export default function DashboardShell({
         <nav className="flex-1 space-y-1 px-3 py-4">
           {items.map((item) => {
             const active = isActivePath(pathname, item.href);
+            const open = item.children ? openHrefs.has(item.href) : false;
             return (
               <div key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                    active
-                      ? "bg-white/10 text-amber-200"
-                      : "text-stone-300 hover:bg-red-900 hover:text-amber-200"
-                  }`}
-                >
-                  <span>{item.icon}</span>
-                  <span className="flex-1">{item.label}</span>
-                  {!!item.badge && (
-                    <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-red-950">
-                      {item.badge}
-                    </span>
+                <div className="flex items-center">
+                  <Link
+                    href={item.href}
+                    onClick={() => {
+                      if (item.children) {
+                        setOpenHrefs((prev) => new Set(prev).add(item.href));
+                      }
+                    }}
+                    className={`flex flex-1 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                      active
+                        ? "bg-white/10 text-amber-200"
+                        : "text-stone-300 hover:bg-red-900 hover:text-amber-200"
+                    }`}
+                  >
+                    <span>{item.icon}</span>
+                    <span className="flex-1">{item.label}</span>
+                    {!!item.badge && (
+                      <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-red-950">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                  {item.children && (
+                    <button
+                      type="button"
+                      onClick={() => toggleOpen(item.href)}
+                      aria-label={open ? "Tutup submenu" : "Buka submenu"}
+                      className="mr-1 flex h-8 w-8 items-center justify-center text-stone-400 hover:text-amber-200"
+                    >
+                      <span
+                        className={`inline-block text-xs transition-transform ${open ? "rotate-90" : ""}`}
+                      >
+                        ▶
+                      </span>
+                    </button>
                   )}
-                </Link>
-                {item.children && (
+                </div>
+                {item.children && open && (
                   <div className="ml-6 mt-1 space-y-1 border-l border-red-900/60 pl-3">
                     {item.children.map((child) => {
                       const childActive = isChildActive(pathname, searchParams, child.href);
@@ -195,26 +233,49 @@ export default function DashboardShell({
               <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
                 {items.map((item) => {
                   const active = isActivePath(pathname, item.href);
+                  const open = item.children ? openHrefs.has(item.href) : false;
                   return (
                     <div key={item.href}>
-                      <Link
-                        href={item.href}
-                        onClick={() => setMobileNavOpen(false)}
-                        className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                          active
-                            ? "bg-white/10 text-amber-200"
-                            : "text-stone-300 hover:bg-red-900 hover:text-amber-200"
-                        }`}
-                      >
-                        <span>{item.icon}</span>
-                        <span className="flex-1">{item.label}</span>
-                        {!!item.badge && (
-                          <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-red-950">
-                            {item.badge}
-                          </span>
+                      <div className="flex items-center">
+                        <Link
+                          href={item.href}
+                          onClick={() => {
+                            if (item.children) {
+                              setOpenHrefs((prev) => new Set(prev).add(item.href));
+                            } else {
+                              setMobileNavOpen(false);
+                            }
+                          }}
+                          className={`flex flex-1 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                            active
+                              ? "bg-white/10 text-amber-200"
+                              : "text-stone-300 hover:bg-red-900 hover:text-amber-200"
+                          }`}
+                        >
+                          <span>{item.icon}</span>
+                          <span className="flex-1">{item.label}</span>
+                          {!!item.badge && (
+                            <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-red-950">
+                              {item.badge}
+                            </span>
+                          )}
+                        </Link>
+                        {item.children && (
+                          <button
+                            type="button"
+                            onClick={() => toggleOpen(item.href)}
+                            aria-label={open ? "Tutup submenu" : "Buka submenu"}
+                            className="mr-1 flex h-8 w-8 items-center justify-center text-stone-400 hover:text-amber-200"
+                          >
+                            <span
+                              className={`inline-block text-xs transition-transform ${open ? "rotate-90" : ""}`}
+                            >
+                              ▶
+                            </span>
+                          </button>
                         )}
-                      </Link>
-                      {item.children && (
+                      </div>
+                      {item.children && open && (
                         <div className="ml-6 mt-1 space-y-1 border-l border-red-900/60 pl-3">
                           {item.children.map((child) => {
                             const childActive = isChildActive(pathname, searchParams, child.href);

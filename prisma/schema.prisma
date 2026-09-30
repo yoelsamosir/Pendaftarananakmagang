@@ -245,6 +245,16 @@ model AppSetting {
   value String
 }
 
+// Isi email notifikasi (subjek+body) yang bisa diedit admin lewat Pengaturan >
+// Email tanpa perlu ubah kode -- kalau baris untuk suatu `type` belum ada,
+// sistem pakai teks default bawaan (lihat lib/emailTemplates.ts).
+model EmailTemplate {
+  type      String   @id
+  subject   String?
+  body      String
+  updatedAt DateTime @updatedAt
+}
+
 // Counter atomik untuk penomoran (nomor pengajuan, nomor surat per tipe+tahun).
 // Increment dilakukan lewat satu statement SQL (lihat lib/nomor.ts), bukan
 // via Prisma Client, supaya tabrakan antar request bersamaan tidak mungkin

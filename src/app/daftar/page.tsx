@@ -147,10 +147,10 @@ export default function DaftarPage() {
                 name="institusi"
                 required
               />
-              <Field label="Fakultas" name="fakultas" />
-              <Field label="Program Studi" name="programStudi" />
-              <Field label="NIM / NIS" name="nimNis" />
-              <Field label="Semester / Kelas" name="semesterKelas" />
+              <Field label="Fakultas" name="fakultas" required />
+              <Field label="Program Studi" name="programStudi" required />
+              <Field label="NIM / NIS" name="nimNis" required />
+              <Field label="Semester / Kelas" name="semesterKelas" required />
             </div>
           </fieldset>
 
@@ -203,7 +203,6 @@ export default function DaftarPage() {
                 required
                 minDate={new Date()}
               />
-              <Field label="Durasi" name="durasi" placeholder="mis. 2 bulan" />
             </div>
             <p className="text-xs text-stone-500">
               Rencana mulai magang minimal {MIN_DAYS_BEFORE_MULAI} hari dari

@@ -1,5 +1,6 @@
 import AccountSettingsForm from "@/components/AccountSettingsForm";
 import EmailSettingsForm from "@/components/EmailSettingsForm";
+import EmailTemplatesForm from "@/components/EmailTemplatesForm";
 
 export default async function PengaturanPage({
   searchParams,
@@ -16,11 +17,18 @@ export default async function PengaturanPage({
       </h1>
       <p className="mt-1 text-sm text-stone-500">
         {isEmailTab
-          ? "Kelola alamat email balasan resmi instansi untuk notifikasi sistem."
+          ? "Kelola alamat balasan dan isi template email notifikasi sistem."
           : "Kelola nama dan password akun admin Anda."}
       </p>
-      <div className="mt-6">
-        {isEmailTab ? <EmailSettingsForm /> : <AccountSettingsForm />}
+      <div className="mt-6 space-y-8">
+        {isEmailTab ? (
+          <>
+            <EmailSettingsForm />
+            <EmailTemplatesForm />
+          </>
+        ) : (
+          <AccountSettingsForm />
+        )}
       </div>
     </div>
   );
