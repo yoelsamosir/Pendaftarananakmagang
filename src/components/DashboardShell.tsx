@@ -90,8 +90,8 @@ export default function DashboardShell({
 
   return (
     <div className="flex min-h-screen bg-stone-100">
-      <aside className="hidden w-64 shrink-0 flex-col bg-red-950 text-stone-100 md:flex">
-        <div className="flex items-center gap-2 border-b border-red-900 px-5 py-5">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-red-950 text-stone-100 md:flex">
+        <div className="flex shrink-0 items-center gap-2 border-b border-red-900 px-5 py-5">
           <span className="flex h-9 items-center rounded-md bg-stone-50 px-2 py-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -104,7 +104,7 @@ export default function DashboardShell({
             {title}
           </span>
         </div>
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
           {items.map((item) => {
             const active = isActivePath(pathname, item.href);
             const open = item.children ? openHrefs.has(item.href) : false;
@@ -171,7 +171,7 @@ export default function DashboardShell({
             );
           })}
         </nav>
-        <div className="border-t border-red-900 px-3 py-4">
+        <div className="shrink-0 border-t border-red-900 px-3 py-4">
           <p className="mb-2 truncate px-3 text-xs text-stone-400">
             {userName}
           </p>
