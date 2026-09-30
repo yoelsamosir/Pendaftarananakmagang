@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ApplicationStatusBadge } from "@/components/StatusBadge";
-import { DOCUMENT_TYPE_LABEL } from "@/lib/constants";
-import DecisionPanel from "./DecisionPanel";
+import ApplicationReviewGate from "./ApplicationReviewGate";
 
 export default async function AdminPengajuanDetailPage({
   params,
@@ -18,9 +17,36 @@ export default async function AdminPengajuanDetailPage({
 
   if (!application) notFound();
 
+  // Cek dulu apakah email pemohon sudah dipakai akun lain, supaya admin bisa
+  // diperingatkan SEBELUM klik "Terima" (decision route menolak reuse akun
+  // non-PESERTA, dan reuse akun PESERTA lama tetap diizinkan tapi perlu
+  // disadari admin — lihat DecisionPanel & QA findings bug #7).
+  let existingAccountNote: { tone: "conflict" | "info"; message: string } | null = null;
+  if (application.status === "DIAJUKAN") {
+    const existingProfile = await prisma.user.findUnique({
+      where: { email: application.email },
+    });
+    if (existingProfile && existingProfile.role !== "PESERTA") {
+      existingAccountNote = {
+        tone: "conflict",
+        message: `Email ini sudah terdaftar sebagai akun ${existingProfile.role} di sistem. Menerima pengajuan ini akan DITOLAK otomatis oleh sistem sampai konfliknya diselesaikan (misalnya minta pemohon memakai email lain).`,
+      };
+    } else if (existingProfile && existingProfile.applicationId && existingProfile.applicationId !== id) {
+      existingAccountNote = {
+        tone: "conflict",
+        message: "Email ini sudah terdaftar pada akun peserta lain (terhubung ke pengajuan berbeda).",
+      };
+    } else if (existingProfile) {
+      existingAccountNote = {
+        tone: "info",
+        message: `Email ini sudah punya akun peserta dari pengajuan sebelumnya (belum terhubung ke pengajuan manapun saat ini). Menerima pengajuan ini akan memakai ulang akun tersebut, bukan membuat akun baru.`,
+      };
+    }
+  }
+
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
-      <div className="space-y-6 lg:col-span-2">
+    <div className="space-y-6">
+      <div>
         <div className="rounded-lg border border-stone-200 bg-white p-5">
           <div className="flex items-center justify-between">
             <p className="font-mono text-sm text-stone-500">
@@ -117,47 +143,20 @@ export default async function AdminPengajuanDetailPage({
             </div>
           )}
         </div>
-
-        <div className="rounded-lg border border-stone-200 bg-white p-5">
-          <h2 className="text-sm font-semibold text-stone-900">Dokumen</h2>
-          <ul className="mt-3 divide-y divide-stone-100">
-            {application.documents.map((doc) => (
-              <li key={doc.id} className="flex items-center justify-between py-3 text-sm">
-                <div>
-                  <p className="text-stone-800">
-                    {DOCUMENT_TYPE_LABEL[doc.type] ?? doc.type}
-                  </p>
-                  <p className="text-xs text-stone-400">{doc.fileName}</p>
-                </div>
-                <a
-                  href={`/api/files/${doc.id}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm font-medium text-red-800 hover:underline"
-                >
-                  Lihat
-                </a>
-              </li>
-            ))}
-            {application.documents.length === 0 && (
-              <li className="py-3 text-sm text-stone-400">Belum ada dokumen.</li>
-            )}
-          </ul>
-        </div>
       </div>
 
-      <div>
-        <DecisionPanel
-          applicationId={application.id}
-          status={application.status}
-          nomorSuratAsal={application.nomorSuratAsal}
-          tanggalSuratAsal={
-            application.tanggalSuratAsal
-              ? application.tanggalSuratAsal.toISOString().slice(0, 10)
-              : null
-          }
-        />
-      </div>
+      <ApplicationReviewGate
+        documents={application.documents}
+        applicationId={application.id}
+        status={application.status}
+        nomorSuratAsal={application.nomorSuratAsal}
+        tanggalSuratAsal={
+          application.tanggalSuratAsal
+            ? application.tanggalSuratAsal.toISOString().slice(0, 10)
+            : null
+        }
+        existingAccountNote={existingAccountNote}
+      />
     </div>
   );
 }

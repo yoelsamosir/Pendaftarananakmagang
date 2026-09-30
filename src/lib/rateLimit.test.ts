@@ -1,15 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const countMock = vi.fn();
+const queryRawMock = vi.fn();
 const deleteManyMock = vi.fn();
-const createMock = vi.fn();
 
 vi.mock("./prisma", () => ({
   prisma: {
+    $queryRaw: (...args: unknown[]) => queryRawMock(...args),
     rateLimitHit: {
-      count: (...args: unknown[]) => countMock(...args),
       deleteMany: (...args: unknown[]) => deleteManyMock(...args),
-      create: (...args: unknown[]) => createMock(...args),
     },
   },
 }));
@@ -17,24 +15,21 @@ vi.mock("./prisma", () => ({
 const { checkRateLimit, getClientIp } = await import("./rateLimit");
 
 beforeEach(() => {
-  countMock.mockReset();
+  queryRawMock.mockReset();
   deleteManyMock.mockReset().mockResolvedValue({ count: 0 });
-  createMock.mockReset().mockResolvedValue({});
 });
 
 describe("checkRateLimit", () => {
-  it("mengizinkan dan mencatat hit baru saat masih di bawah batas", async () => {
-    countMock.mockResolvedValue(2);
+  it("mengizinkan saat insert atomik berhasil (masih di bawah batas)", async () => {
+    queryRawMock.mockResolvedValue([{ id: "some-id" }]);
     const allowed = await checkRateLimit("test:key", 5, 60_000);
     expect(allowed).toBe(true);
-    expect(createMock).toHaveBeenCalledTimes(1);
   });
 
-  it("menolak dan tidak mencatat hit baru saat sudah mencapai batas", async () => {
-    countMock.mockResolvedValue(5);
+  it("menolak saat insert atomik tidak menghasilkan baris (sudah mencapai batas)", async () => {
+    queryRawMock.mockResolvedValue([]);
     const allowed = await checkRateLimit("test:key", 5, 60_000);
     expect(allowed).toBe(false);
-    expect(createMock).not.toHaveBeenCalled();
   });
 });
 

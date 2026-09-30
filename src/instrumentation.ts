@@ -11,8 +11,11 @@ export const onRequestError: Instrumentation.onRequestError = async (
 ) => {
   try {
     const { prisma } = await import("@/lib/prisma");
-    const message = err instanceof Error ? err.message : String(err);
-    const stack = err instanceof Error ? err.stack ?? null : null;
+    // Dipotong supaya satu error dengan stack trace sangat panjang (atau
+    // pesan yang tanpa sengaja menyertakan data besar) tidak membuat baris
+    // ErrorLog tumbuh tak terkendali.
+    const message = (err instanceof Error ? err.message : String(err)).slice(0, 1000);
+    const stack = err instanceof Error ? err.stack?.slice(0, 4000) ?? null : null;
 
     await prisma.errorLog.create({
       data: {

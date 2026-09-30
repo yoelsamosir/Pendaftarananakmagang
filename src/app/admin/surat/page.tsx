@@ -1,20 +1,56 @@
 import { prisma } from "@/lib/prisma";
+import Pagination from "@/components/Pagination";
+import { Prisma } from "@prisma/client";
 
 const TYPE_LABEL: Record<string, string> = {
   PENERIMAAN: "Surat Penerimaan / Balasan Permohonan Magang",
   SELESAI: "Surat Keterangan Telah Selesai Magang",
 };
 
-export default async function AdminSuratPage() {
-  const letters = await prisma.letter.findMany({
-    orderBy: { date: "desc" },
-    include: { application: true },
-  });
+const PAGE_SIZE = 10;
+
+export default async function AdminSuratPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; page?: string }>;
+}) {
+  const params = await searchParams;
+  const q = params.q?.trim();
+  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
+
+  const where: Prisma.LetterWhereInput = {};
+  if (q) {
+    where.OR = [
+      { number: { contains: q } },
+      { application: { namaLengkap: { contains: q } } },
+      { application: { nomorPengajuan: { contains: q } } },
+    ];
+  }
+
+  const [letters, total] = await Promise.all([
+    prisma.letter.findMany({
+      where,
+      orderBy: { date: "desc" },
+      include: { application: true },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.letter.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const documents = await prisma.document.findMany({
     where: { storedPath: { in: letters.map((l) => l.pdfPath) } },
   });
   const documentByPath = new Map(documents.map((d) => [d.storedPath, d.id]));
+
+  const buildHref = (p: number) => {
+    const sp = new URLSearchParams();
+    if (q) sp.set("q", q);
+    if (p > 1) sp.set("page", String(p));
+    const qs = sp.toString();
+    return qs ? `/admin/surat?${qs}` : "/admin/surat";
+  };
 
   return (
     <div>
@@ -23,6 +59,15 @@ export default async function AdminSuratPage() {
         Surat resmi diterbitkan otomatis oleh sistem saat pengajuan diterima
         atau penyelesaian magang disetujui.
       </p>
+
+      <form className="mt-4" method="get">
+        <input
+          name="q"
+          defaultValue={q}
+          placeholder="Cari nomor surat, nama peserta, atau nomor pengajuan..."
+          className="w-full max-w-md rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
+        />
+      </form>
 
       <div className="mt-6 overflow-x-auto rounded-lg border border-stone-200 bg-white">
         <table className="w-full min-w-[760px] text-sm">
@@ -39,7 +84,7 @@ export default async function AdminSuratPage() {
             {letters.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center text-stone-400">
-                  Belum ada surat diterbitkan.
+                  Tidak ada surat.
                 </td>
               </tr>
             )}
@@ -70,6 +115,8 @@ export default async function AdminSuratPage() {
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
     </div>
   );
 }

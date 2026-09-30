@@ -6,6 +6,7 @@ import { generateSuratSelesaiPdf } from "@/lib/pdf";
 import { saveGeneratedFile } from "@/lib/storage";
 import { sendNotificationEmail } from "@/lib/email";
 import { writeAuditLog } from "@/lib/audit";
+import { requireAwaitingDecision } from "@/lib/decisionGuard";
 
 export async function POST(
   req: NextRequest,
@@ -32,10 +33,20 @@ export async function POST(
     return NextResponse.json({ error: "Pengajuan selesai tidak ditemukan" }, { status: 404 });
   }
 
-  await prisma.completionRequest.update({
-    where: { id },
+  const statusGuard = requireAwaitingDecision(request.status, "Pengajuan penyelesaian magang");
+  if ("error" in statusGuard) return statusGuard.error;
+
+  // Klaim atomik -- lihat catatan yang sama di applications/[id]/decision/route.ts.
+  const claim = await prisma.completionRequest.updateMany({
+    where: { id, status: "DIAJUKAN" },
     data: { status: decision, adminNote: adminNote || null, decidedAt: new Date() },
   });
+  if (claim.count === 0) {
+    return NextResponse.json(
+      { error: "Pengajuan ini baru saja diputuskan oleh proses lain." },
+      { status: 409 }
+    );
+  }
 
   await writeAuditLog({
     actorId: session.userId,
@@ -76,28 +87,30 @@ export async function POST(
     "surat-keterangan-selesai.pdf"
   );
 
-  const letter = await prisma.letter.create({
-    data: {
-      type: "SELESAI",
-      number: nomorSurat,
-      applicationId: request.applicationId,
-      userId: request.userId,
-      pdfPath,
-    },
-  });
-
-  await prisma.document.create({
-    data: {
-      category: "PENYELESAIAN",
-      type: "SURAT_KETERANGAN_SELESAI",
-      fileName: `Surat Keterangan Selesai Magang - ${request.application.namaLengkap}.pdf`,
-      storedPath: pdfPath,
-      mimeType: "application/pdf",
-      size: pdfBuffer.length,
-      applicationId: request.applicationId,
-      uploadedById: session.userId,
-    },
-  });
+  // Satu transaksi supaya letter & document tercatat bersamaan.
+  const [letter] = await prisma.$transaction([
+    prisma.letter.create({
+      data: {
+        type: "SELESAI",
+        number: nomorSurat,
+        applicationId: request.applicationId,
+        userId: request.userId,
+        pdfPath,
+      },
+    }),
+    prisma.document.create({
+      data: {
+        category: "PENYELESAIAN",
+        type: "SURAT_KETERANGAN_SELESAI",
+        fileName: `Surat Keterangan Selesai Magang - ${request.application.namaLengkap}.pdf`,
+        storedPath: pdfPath,
+        mimeType: "application/pdf",
+        size: pdfBuffer.length,
+        applicationId: request.applicationId,
+        uploadedById: session.userId,
+      },
+    }),
+  ]);
 
   await sendNotificationEmail({
     to: request.user.email,

@@ -2,15 +2,30 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import LogoutButton from "./LogoutButton";
 
-type NavItem = { href: string; label: string; icon: string; badge?: number };
+type NavChild = { href: string; label: string };
+type NavItem = { href: string; label: string; icon: string; badge?: number; children?: NavChild[] };
 type PollBadge = { href: string; url: string; intervalMs?: number };
 
 function isActivePath(pathname: string, href: string) {
-  if (href === "/admin" || href === "/dashboard") return pathname === href;
-  return pathname === href || pathname.startsWith(`${href}/`);
+  const path = href.split("?")[0];
+  if (path === "/admin" || path === "/dashboard") return pathname === path;
+  return pathname === path || pathname.startsWith(`${path}/`);
+}
+
+// Anak-menu dibedakan lewat query string (mis. ?tab=alumni), bukan path --
+// child tanpa query dianggap kondisi default ("tab" tidak ada di URL).
+function isChildActive(pathname: string, searchParams: URLSearchParams, childHref: string) {
+  const [childPath, childQuery] = childHref.split("?");
+  if (pathname !== childPath) return false;
+  if (!childQuery) return !searchParams.get("tab");
+  const childParams = new URLSearchParams(childQuery);
+  for (const [key, value] of childParams) {
+    if (searchParams.get(key) !== value) return false;
+  }
+  return true;
 }
 
 export default function DashboardShell({
@@ -29,6 +44,7 @@ export default function DashboardShell({
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [polledBadge, setPolledBadge] = useState<number | null>(null);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!pollBadge) return;
@@ -76,23 +92,44 @@ export default function DashboardShell({
           {items.map((item) => {
             const active = isActivePath(pathname, item.href);
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                  active
-                    ? "bg-white/10 text-amber-200"
-                    : "text-stone-300 hover:bg-red-900 hover:text-amber-200"
-                }`}
-              >
-                <span>{item.icon}</span>
-                <span className="flex-1">{item.label}</span>
-                {!!item.badge && (
-                  <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-red-950">
-                    {item.badge}
-                  </span>
+              <div key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                    active
+                      ? "bg-white/10 text-amber-200"
+                      : "text-stone-300 hover:bg-red-900 hover:text-amber-200"
+                  }`}
+                >
+                  <span>{item.icon}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {!!item.badge && (
+                    <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-red-950">
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+                {item.children && (
+                  <div className="ml-6 mt-1 space-y-1 border-l border-red-900/60 pl-3">
+                    {item.children.map((child) => {
+                      const childActive = isChildActive(pathname, searchParams, child.href);
+                      return (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className={`block rounded-md px-3 py-1.5 text-xs font-medium ${
+                            childActive
+                              ? "text-amber-200"
+                              : "text-stone-400 hover:text-amber-200"
+                          }`}
+                        >
+                          {child.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 )}
-              </Link>
+              </div>
             );
           })}
         </nav>
@@ -159,24 +196,46 @@ export default function DashboardShell({
                 {items.map((item) => {
                   const active = isActivePath(pathname, item.href);
                   return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMobileNavOpen(false)}
-                      className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                        active
-                          ? "bg-white/10 text-amber-200"
-                          : "text-stone-300 hover:bg-red-900 hover:text-amber-200"
-                      }`}
-                    >
-                      <span>{item.icon}</span>
-                      <span className="flex-1">{item.label}</span>
-                      {!!item.badge && (
-                        <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-red-950">
-                          {item.badge}
-                        </span>
+                    <div key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setMobileNavOpen(false)}
+                        className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                          active
+                            ? "bg-white/10 text-amber-200"
+                            : "text-stone-300 hover:bg-red-900 hover:text-amber-200"
+                        }`}
+                      >
+                        <span>{item.icon}</span>
+                        <span className="flex-1">{item.label}</span>
+                        {!!item.badge && (
+                          <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-red-950">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                      {item.children && (
+                        <div className="ml-6 mt-1 space-y-1 border-l border-red-900/60 pl-3">
+                          {item.children.map((child) => {
+                            const childActive = isChildActive(pathname, searchParams, child.href);
+                            return (
+                              <Link
+                                key={child.href}
+                                href={child.href}
+                                onClick={() => setMobileNavOpen(false)}
+                                className={`block rounded-md px-3 py-1.5 text-xs font-medium ${
+                                  childActive
+                                    ? "text-amber-200"
+                                    : "text-stone-400 hover:text-amber-200"
+                                }`}
+                              >
+                                {child.label}
+                              </Link>
+                            );
+                          })}
+                        </div>
                       )}
-                    </Link>
+                    </div>
                   );
                 })}
               </nav>

@@ -41,6 +41,11 @@ enum LetterType {
   SELESAI
 }
 
+enum RejectionCategory {
+  KUOTA_PENUH
+  LAINNYA
+}
+
 // Profil aplikasi untuk pengguna Supabase Auth. `id` sama persis dengan
 // auth.users.id (dikelola Supabase Auth, bukan Prisma) — password, undangan,
 // dan reset password ditangani sepenuhnya oleh Supabase Auth.
@@ -99,10 +104,12 @@ model Application {
   tanggalSuratAsal DateTime?
 
   // keputusan admin
-  catatanAdmin String?
-  alasanTolak  String?
-  decidedAt    DateTime?
-  decidedById  String?
+  catatanAdmin           String?
+  alasanTolak            String?
+  alasanTolakKategori    RejectionCategory?
+  dokumenPerluDiperbaiki String[]           @default([])
+  decidedAt              DateTime?
+  decidedById            String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -148,6 +155,12 @@ model RoomSchedule {
   date   DateTime
 
   createdAt DateTime @default(now())
+
+  // Menutup race condition di level database: cek konflik di route.ts
+  // (findFirst lalu create) masih rawan TOCTOU kalau dua request dieksekusi
+  // benar-benar bersamaan -- constraint ini yang jadi jaminan akhir.
+  @@unique([roomId, date])
+  @@unique([userId, date])
 }
 
 model CompletionRequest {
@@ -223,4 +236,13 @@ model ErrorLog {
   createdAt DateTime @default(now())
 
   @@index([createdAt])
+}
+
+// Counter atomik untuk penomoran (nomor pengajuan, nomor surat per tipe+tahun).
+// Increment dilakukan lewat satu statement SQL (lihat lib/nomor.ts), bukan
+// via Prisma Client, supaya tabrakan antar request bersamaan tidak mungkin
+// terjadi di level database.
+model NumberCounter {
+  id    String @id
+  value Int    @default(0)
 }

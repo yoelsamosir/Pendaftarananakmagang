@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest) {
 
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({
-    data: { name, role: session.role },
+    data: { name },
   });
   if (error) {
     return NextResponse.json({ error: "Gagal menyimpan nama" }, { status: 500 });

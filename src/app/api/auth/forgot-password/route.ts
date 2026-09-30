@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendMail } from "@/lib/mailer";
 import { prisma } from "@/lib/prisma";
 import { forgotPasswordSchema } from "@/lib/validation";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const GENERIC_MESSAGE =
   "Jika email terdaftar di sistem, tautan reset password sudah dikirim.";
@@ -15,15 +16,19 @@ export async function POST(req: NextRequest) {
   }
   const email = parsed.data.email.toLowerCase();
 
-  // Cegah spam: tolak jika baru saja ada permintaan reset untuk email yang sama.
-  const recent = await prisma.emailLog.findFirst({
-    where: {
-      to: email,
-      type: "RESET_PASSWORD",
-      createdAt: { gte: new Date(Date.now() - 2 * 60 * 1000) },
-    },
-  });
-  if (recent) {
+  // Sama seperti endpoint publik lain (lihat lib/rateLimit.ts): dibatasi per-IP
+  // (cegah satu sumber mencoba banyak email berbeda) dan per-email (cegah spam
+  // ke satu akun), lewat mekanisme RateLimitHit yang konsisten di seluruh app.
+  const ip = getClientIp(req);
+  const ipOk = await checkRateLimit(`forgot-password:ip:${ip}`, 10, 15 * 60 * 1000);
+  if (!ipOk) {
+    return NextResponse.json(
+      { error: "Terlalu banyak permintaan reset password. Coba lagi dalam 15 menit." },
+      { status: 429 }
+    );
+  }
+  const emailOk = await checkRateLimit(`forgot-password:email:${email}`, 1, 2 * 60 * 1000);
+  if (!emailOk) {
     return NextResponse.json(
       { error: "Anda baru saja meminta reset password. Coba lagi dalam beberapa menit." },
       { status: 429 }
@@ -53,8 +58,12 @@ export async function POST(req: NextRequest) {
         console.error("Gagal mengirim email reset password:", err);
       }
 
+      // Token sekali-pakai TIDAK disimpan ke EmailLog (beda dari email yang
+      // benar-benar dikirim) -- lihat catatan yang sama di lib/email.ts.
+      const logText =
+        "Anda (atau seseorang) meminta reset password untuk akun ini. Tautan reset password sekali-pakai dikirim ke email (tidak disimpan di log ini).";
       await prisma.emailLog.create({
-        data: { to: email, subject, body: text, type: "RESET_PASSWORD", status },
+        data: { to: email, subject, body: logText, type: "RESET_PASSWORD", status },
       });
     }
   } catch (err) {

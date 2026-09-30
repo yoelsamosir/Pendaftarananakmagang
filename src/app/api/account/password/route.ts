@@ -4,11 +4,24 @@ import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/auth";
 import { changePasswordSchema } from "@/lib/validation";
 import { writeAuditLog } from "@/lib/audit";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function PATCH(req: NextRequest) {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Belum masuk" }, { status: 401 });
+  }
+
+  // Verifikasi currentPassword di bawah pada dasarnya adalah percobaan login
+  // — kalau sesi pengguna dibajak (XSS, cookie bocor) tanpa tahu password
+  // aslinya, endpoint ini bisa dipakai untuk brute-force. Dibatasi sama
+  // seperti endpoint auth lain di app ini.
+  const ok = await checkRateLimit(`account-password:user:${session.userId}`, 5, 15 * 60 * 1000);
+  if (!ok) {
+    return NextResponse.json(
+      { error: "Terlalu banyak percobaan. Coba lagi dalam 15 menit." },
+      { status: 429 }
+    );
   }
 
   const body = await req.json().catch(() => null);

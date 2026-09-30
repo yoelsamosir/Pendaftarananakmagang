@@ -29,11 +29,18 @@ export default async function AdminLayout({
       icon: "📋",
       badge: pengajuanBaru,
     },
-    { href: "/admin/peserta", label: "Peserta", icon: "👥" },
+    {
+      href: "/admin/peserta",
+      label: "Peserta",
+      icon: "👥",
+      children: [
+        { href: "/admin/peserta", label: "Aktif Magang" },
+        { href: "/admin/peserta?tab=alumni", label: "Alumni" },
+      ],
+    },
     { href: "/admin/jadwal", label: "Jadwal / Ruangan", icon: "📅" },
     { href: "/admin/dokumen", label: "Dokumen", icon: "📄" },
     { href: "/admin/surat", label: "Surat", icon: "✉️" },
-    { href: "/admin/penyelesaian", label: "Penyelesaian Magang", icon: "📝" },
     { href: "/admin/email-log", label: "Email Log", icon: "📧" },
     {
       href: "/admin/error-log",

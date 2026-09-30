@@ -55,13 +55,13 @@ export async function POST(req: NextRequest) {
   }
 
   // Cegah bentrokan: satu ruangan hanya untuk satu peserta pada tanggal yang sama.
-  const conflicts = await prisma.roomSchedule.findMany({
+  const roomConflicts = await prisma.roomSchedule.findMany({
     where: { roomId, date: { in: dates } },
   });
-  if (conflicts.length > 0) {
+  if (roomConflicts.length > 0) {
     return NextResponse.json(
       {
-        error: `Ruangan sudah digunakan peserta lain pada tanggal: ${conflicts
+        error: `Ruangan sudah digunakan peserta lain pada tanggal: ${roomConflicts
           .map((c) => c.date.toLocaleDateString("id-ID"))
           .join(", ")}`,
       },
@@ -69,14 +69,47 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const created = await prisma.$transaction(
-    dates.map((date) =>
-      prisma.roomSchedule.create({
-        data: { roomId, userId, date },
-        include: { room: true, user: true },
-      })
-    )
-  );
+  // Cegah bentrokan sebaliknya: satu peserta tidak boleh dijadwalkan ke dua
+  // ruangan berbeda pada tanggal yang sama.
+  const userConflicts = await prisma.roomSchedule.findMany({
+    where: { userId, date: { in: dates } },
+    include: { room: true },
+  });
+  if (userConflicts.length > 0) {
+    return NextResponse.json(
+      {
+        error: `Peserta ini sudah dijadwalkan di ${userConflicts[0].room.name} pada tanggal: ${userConflicts
+          .map((c) => c.date.toLocaleDateString("id-ID"))
+          .join(", ")}`,
+      },
+      { status: 409 }
+    );
+  }
+
+  // Pengecekan di atas (findMany) masih rawan TOCTOU kalau dua request
+  // dieksekusi benar-benar bersamaan -- constraint unik di skema (@@unique
+  // [roomId, date] & [userId, date]) adalah jaminan akhirnya, ditangkap di sini.
+  let created;
+  try {
+    created = await prisma.$transaction(
+      dates.map((date) =>
+        prisma.roomSchedule.create({
+          data: { roomId, userId, date },
+          include: { room: true, user: true },
+        })
+      )
+    );
+  } catch (err) {
+    const code =
+      typeof err === "object" && err !== null ? (err as { code?: string }).code : undefined;
+    if (code === "P2002") {
+      return NextResponse.json(
+        { error: "Jadwal ini bentrok dengan jadwal lain yang baru saja dibuat" },
+        { status: 409 }
+      );
+    }
+    throw err;
+  }
 
   const first = created[0];
   const periodeText =

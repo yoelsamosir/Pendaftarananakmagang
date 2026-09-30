@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
 import { writeAuditLog } from "@/lib/audit";
+import { updateParticipantDataSchema } from "@/lib/validation";
 
 export async function GET() {
   const guard = await requireRole("PESERTA");
@@ -31,6 +32,14 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Data tidak valid" }, { status: 400 });
 
+  const parsed = updateParticipantDataSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message || "Data tidak valid" },
+      { status: 400 }
+    );
+  }
+
   const allowedFields = [
     "telepon",
     "alamat",
@@ -42,7 +51,7 @@ export async function PATCH(req: NextRequest) {
 
   const data: Record<string, string | null> = {};
   for (const field of allowedFields) {
-    if (field in body) data[field] = body[field] || null;
+    if (field in body) data[field] = parsed.data[field] || null;
   }
 
   const before = await prisma.application.findUnique({ where: { id: user.applicationId } });

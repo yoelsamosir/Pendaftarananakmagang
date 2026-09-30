@@ -9,6 +9,7 @@ async function getStats() {
     ditolak,
     pesertaAktif,
     pengajuanSelesai,
+    emailGagal,
     dokumenTerbaru,
   ] = await Promise.all([
     prisma.application.count({ where: { status: "DIAJUKAN" } }),
@@ -17,13 +18,23 @@ async function getStats() {
     prisma.application.count({ where: { status: "DITOLAK" } }),
     prisma.user.count({ where: { role: "PESERTA", isActive: true } }),
     prisma.completionRequest.count({ where: { status: "DIAJUKAN" } }),
+    prisma.emailLog.count({ where: { status: "FAILED" } }),
     prisma.document.findMany({
       orderBy: { createdAt: "desc" },
       take: 5,
       include: { application: true },
     }),
   ]);
-  return { baru, dalamVerifikasi, diterima, ditolak, pesertaAktif, pengajuanSelesai, dokumenTerbaru };
+  return {
+    baru,
+    dalamVerifikasi,
+    diterima,
+    ditolak,
+    pesertaAktif,
+    pengajuanSelesai,
+    emailGagal,
+    dokumenTerbaru,
+  };
 }
 
 export default async function AdminDashboardPage() {
@@ -35,12 +46,25 @@ export default async function AdminDashboardPage() {
     { label: "Diterima", value: stats.diterima, href: "/admin/pengajuan?status=DITERIMA" },
     { label: "Ditolak", value: stats.ditolak, href: "/admin/pengajuan?status=DITOLAK" },
     { label: "Peserta Aktif", value: stats.pesertaAktif, href: "/admin/peserta" },
-    { label: "Pengajuan Selesai Menunggu", value: stats.pengajuanSelesai, href: "/admin/penyelesaian" },
+    { label: "Pengajuan Selesai Menunggu", value: stats.pengajuanSelesai, href: "/admin/peserta" },
   ];
 
   return (
     <div>
       <h1 className="text-xl font-serif font-bold text-stone-900">Dashboard Admin</h1>
+
+      {stats.emailGagal > 0 && (
+        <Link
+          href="/admin/email-log?status=FAILED"
+          className="mt-4 flex items-center justify-between rounded-lg border border-red-300 bg-red-50 p-4 hover:bg-red-100"
+        >
+          <p className="text-sm font-medium text-red-800">
+            {stats.emailGagal} email notifikasi gagal terkirim
+          </p>
+          <span className="text-xs text-red-700 underline">Lihat Email Log</span>
+        </Link>
+      )}
+
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
         {cards.map((c) => (
           <Link

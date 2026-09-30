@@ -14,7 +14,7 @@ const statusFilters: { value: ApplicationStatus | ""; label: string }[] = [
   { value: "DITOLAK", label: "Ditolak" },
 ];
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 export default async function AdminPengajuanPage({
   searchParams,
@@ -97,12 +97,13 @@ export default async function AdminPengajuanPage({
               <th className="px-4 py-3 font-medium">Institusi</th>
               <th className="px-4 py-3 font-medium">Periode</th>
               <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
             {applications.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-stone-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-stone-400">
                   Tidak ada pengajuan.
                 </td>
               </tr>
@@ -128,6 +129,14 @@ export default async function AdminPengajuanPage({
                 </td>
                 <td className="px-4 py-3">
                   <ApplicationStatusBadge status={a.status} />
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <Link
+                    href={`/admin/pengajuan/${a.id}`}
+                    className="font-medium text-red-800 hover:underline"
+                  >
+                    Lihat
+                  </Link>
                 </td>
               </ClickableRow>
             ))}
