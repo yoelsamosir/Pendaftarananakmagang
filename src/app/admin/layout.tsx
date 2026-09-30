@@ -48,7 +48,15 @@ export default async function AdminLayout({
       icon: "🐞",
       badge: errorCount24h,
     },
-    { href: "/admin/pengaturan", label: "Pengaturan", icon: "⚙️" },
+    {
+      href: "/admin/pengaturan",
+      label: "Pengaturan",
+      icon: "⚙️",
+      children: [
+        { href: "/admin/pengaturan", label: "Akun" },
+        { href: "/admin/pengaturan?tab=email", label: "Email" },
+      ],
+    },
     { href: "/admin/audit-log", label: "Audit Log", icon: "🔐" },
   ];
 

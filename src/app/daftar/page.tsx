@@ -168,7 +168,9 @@ export default function DaftarPage() {
                   defaultValue=""
                   className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
                 >
-                  <option value="">Pilih jenis magang</option>
+                  <option value="" disabled hidden>
+                    Pilih jenis magang
+                  </option>
                   <option value="Mandiri">Mandiri</option>
                   <option value="Wajib">Wajib</option>
                 </select>

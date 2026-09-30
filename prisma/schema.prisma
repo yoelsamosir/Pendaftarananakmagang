@@ -238,6 +238,13 @@ model ErrorLog {
   @@index([createdAt])
 }
 
+// Pengaturan aplikasi yang bisa diubah admin lewat UI tanpa perlu redeploy
+// (mis. email balasan resmi instansi), disimpan sebagai key-value sederhana.
+model AppSetting {
+  key   String @id
+  value String
+}
+
 // Counter atomik untuk penomoran (nomor pengajuan, nomor surat per tipe+tahun).
 // Increment dilakukan lewat satu statement SQL (lihat lib/nomor.ts), bukan
 // via Prisma Client, supaya tabrakan antar request bersamaan tidak mungkin
