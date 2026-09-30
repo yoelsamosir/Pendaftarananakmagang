@@ -159,7 +159,20 @@ export default function DaftarPage() {
               3. Data Magang
             </legend>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Jenis / Kategori Magang" name="jenisMagang" />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-stone-700">
+                  Jenis / Kategori Magang
+                </label>
+                <select
+                  name="jenisMagang"
+                  defaultValue=""
+                  className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
+                >
+                  <option value="">Pilih jenis magang</option>
+                  <option value="Mandiri">Mandiri</option>
+                  <option value="Wajib">Wajib</option>
+                </select>
+              </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-stone-700">
                   Divisi / Bagian (jika sudah diketahui)
