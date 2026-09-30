@@ -9,7 +9,7 @@ const statusFilters: { value: "" | "FAILED" | "SENT"; label: string }[] = [
   { value: "SENT", label: "Terkirim" },
 ];
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 export default async function AdminEmailLogPage({
   searchParams,

@@ -1,11 +1,28 @@
 import { prisma } from "@/lib/prisma";
+import Pagination from "@/components/Pagination";
 
-export default async function AdminAuditLogPage() {
-  const logs = await prisma.auditLog.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 300,
-    include: { actor: true },
-  });
+const PAGE_SIZE = 10;
+
+export default async function AdminAuditLogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
+
+  const [logs, total] = await Promise.all([
+    prisma.auditLog.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { actor: true },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.auditLog.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const buildHref = (p: number) => (p > 1 ? `/admin/audit-log?page=${p}` : "/admin/audit-log");
 
   return (
     <div>
@@ -30,7 +47,7 @@ export default async function AdminAuditLogPage() {
               </tr>
             )}
             {logs.map((log) => (
-              <tr key={log.id}>
+              <tr key={log.id} className="hover:bg-stone-50">
                 <td className="px-4 py-3 text-stone-500">
                   {log.createdAt.toLocaleString("id-ID")}
                 </td>
@@ -47,6 +64,8 @@ export default async function AdminAuditLogPage() {
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
     </div>
   );
 }

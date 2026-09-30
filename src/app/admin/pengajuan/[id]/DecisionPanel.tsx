@@ -14,12 +14,14 @@ export default function DecisionPanel({
   nomorSuratAsal,
   tanggalSuratAsal,
   existingAccountNote,
+  allDocumentsReviewed,
 }: {
   applicationId: string;
   status: string;
   nomorSuratAsal?: string | null;
   tanggalSuratAsal?: string | null;
   existingAccountNote?: { tone: "conflict" | "info"; message: string } | null;
+  allDocumentsReviewed: boolean;
 }) {
   const router = useRouter();
   const [note, setNote] = useState("");
@@ -206,24 +208,30 @@ export default function DecisionPanel({
         />
       </div>
 
+      {!allDocumentsReviewed && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Buka dan tinjau semua dokumen pemohon di atas sebelum mengambil keputusan.
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-3">
         <button
           onClick={() => decide("TERIMA")}
-          disabled={loading !== null}
+          disabled={loading !== null || !allDocumentsReviewed}
           className="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
         >
           {loading === "TERIMA" ? "Memproses..." : "Terima"}
         </button>
         <button
           onClick={() => decide("PERLU_PERBAIKAN")}
-          disabled={loading !== null}
+          disabled={loading !== null || !allDocumentsReviewed}
           className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-60"
         >
           {loading === "PERLU_PERBAIKAN" ? "Memproses..." : "Perlu Perbaikan"}
         </button>
         <button
           onClick={() => decide("TOLAK")}
-          disabled={loading !== null}
+          disabled={loading !== null || !allDocumentsReviewed}
           className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60"
         >
           {loading === "TOLAK" ? "Memproses..." : "Tolak"}

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ApplicationStatusBadge, CompletionStatusBadge } from "@/components/StatusBadge";
 import { DOCUMENT_TYPE_LABEL } from "@/lib/constants";
 import AccountPanel from "./AccountPanel";
+import CompletionRequestPanel from "./CompletionRequestPanel";
 
 export default async function AdminPesertaDetailPage({
   params,
@@ -88,12 +89,16 @@ export default async function AdminPesertaDetailPage({
       <div className="rounded-lg border border-stone-200 bg-white p-5">
         <h2 className="text-sm font-semibold text-stone-900">Pengajuan Selesai Magang</h2>
         <ul className="mt-3 divide-y divide-stone-100">
-          {app.completionRequests.map((c) => (
-            <li key={c.id} className="flex items-center justify-between py-2 text-sm">
-              <span>{c.submittedAt.toLocaleDateString("id-ID")}</span>
-              <CompletionStatusBadge status={c.status} />
-            </li>
-          ))}
+          {app.completionRequests.map((c) =>
+            c.status === "DIAJUKAN" ? (
+              <CompletionRequestPanel key={c.id} request={c} />
+            ) : (
+              <li key={c.id} className="flex items-center justify-between py-2 text-sm">
+                <span>{c.submittedAt.toLocaleDateString("id-ID")}</span>
+                <CompletionStatusBadge status={c.status} />
+              </li>
+            )
+          )}
           {app.completionRequests.length === 0 && (
             <li className="py-3 text-sm text-stone-400">Belum ada pengajuan selesai.</li>
           )}

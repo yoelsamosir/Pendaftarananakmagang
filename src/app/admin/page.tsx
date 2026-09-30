@@ -46,7 +46,7 @@ export default async function AdminDashboardPage() {
     { label: "Diterima", value: stats.diterima, href: "/admin/pengajuan?status=DITERIMA" },
     { label: "Ditolak", value: stats.ditolak, href: "/admin/pengajuan?status=DITOLAK" },
     { label: "Peserta Aktif", value: stats.pesertaAktif, href: "/admin/peserta" },
-    { label: "Pengajuan Selesai Menunggu", value: stats.pengajuanSelesai, href: "/admin/penyelesaian" },
+    { label: "Pengajuan Selesai Menunggu", value: stats.pengajuanSelesai, href: "/admin/peserta" },
   ];
 
   return (
