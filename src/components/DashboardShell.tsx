@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import LogoutButton from "./LogoutButton";
+import NavIcon from "./NavIcon";
 
 type NavChild = { href: string; label: string };
 type NavItem = { href: string; label: string; icon: string; badge?: number; children?: NavChild[] };
@@ -95,7 +96,7 @@ export default function DashboardShell({
           <span className="flex h-9 items-center rounded-md bg-stone-50 px-2 py-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo-sidebar.svg"
+              src="/logo-balai-yanpus.svg"
               alt="Balai Layanan Perpustakaan"
               className="h-6 w-auto"
             />
@@ -124,7 +125,7 @@ export default function DashboardShell({
                         : "text-stone-300 hover:bg-red-900 hover:text-amber-200"
                     }`}
                   >
-                    <span>{item.icon}</span>
+                    <NavIcon name={item.icon} className="h-5 w-5 shrink-0" />
                     <span className="flex-1">{item.label}</span>
                     {!!item.badge && (
                       <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-red-950">
@@ -184,7 +185,7 @@ export default function DashboardShell({
           <div className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo-sidebar.svg"
+              src="/logo-balai-yanpus.svg"
               alt="Balai Layanan Perpustakaan"
               className="h-6 w-auto"
             />
@@ -212,7 +213,7 @@ export default function DashboardShell({
                   <span className="flex h-9 items-center rounded-md bg-stone-50 px-2 py-1">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src="/logo-sidebar.svg"
+                      src="/logo-balai-yanpus.svg"
                       alt="Balai Layanan Perpustakaan"
                       className="h-6 w-auto"
                     />
@@ -252,7 +253,7 @@ export default function DashboardShell({
                               : "text-stone-300 hover:bg-red-900 hover:text-amber-200"
                           }`}
                         >
-                          <span>{item.icon}</span>
+                          <NavIcon name={item.icon} className="h-5 w-5 shrink-0" />
                           <span className="flex-1">{item.label}</span>
                           {!!item.badge && (
                             <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-red-950">

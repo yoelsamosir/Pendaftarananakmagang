@@ -3,12 +3,12 @@ import { getSession } from "@/lib/auth";
 import DashboardShell from "@/components/DashboardShell";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: "🏠" },
-  { href: "/dashboard/data-saya", label: "Data Saya", icon: "👤" },
-  { href: "/dashboard/jadwal", label: "Jadwal Magang", icon: "📅" },
-  { href: "/dashboard/dokumen", label: "Dokumen & Surat", icon: "📄" },
-  { href: "/dashboard/selesai", label: "Pengajuan Selesai Magang", icon: "📝" },
-  { href: "/dashboard/akun", label: "Akun Saya", icon: "🔐" },
+  { href: "/dashboard", label: "Dashboard", icon: "home" },
+  { href: "/dashboard/data-saya", label: "Data Saya", icon: "user" },
+  { href: "/dashboard/jadwal", label: "Jadwal Magang", icon: "calendar" },
+  { href: "/dashboard/dokumen", label: "Dokumen & Surat", icon: "document" },
+  { href: "/dashboard/selesai", label: "Pengajuan Selesai Magang", icon: "flag" },
+  { href: "/dashboard/akun", label: "Akun Saya", icon: "lock" },
 ];
 
 export default async function DashboardLayout({
