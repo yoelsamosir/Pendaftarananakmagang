@@ -95,7 +95,7 @@ export default function DashboardShell({
           <span className="flex h-9 items-center rounded-md bg-stone-50 px-2 py-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo-balai-yanpus.svg"
+              src="/logo-sidebar.svg"
               alt="Balai Layanan Perpustakaan"
               className="h-6 w-auto"
             />
@@ -184,7 +184,7 @@ export default function DashboardShell({
           <div className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo-balai-yanpus.svg"
+              src="/logo-sidebar.svg"
               alt="Balai Layanan Perpustakaan"
               className="h-6 w-auto"
             />
@@ -212,7 +212,7 @@ export default function DashboardShell({
                   <span className="flex h-9 items-center rounded-md bg-stone-50 px-2 py-1">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src="/logo-balai-yanpus.svg"
+                      src="/logo-sidebar.svg"
                       alt="Balai Layanan Perpustakaan"
                       className="h-6 w-auto"
                     />

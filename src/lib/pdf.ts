@@ -93,6 +93,36 @@ function tgl(d: Date) {
   return format(d, "d MMMM yyyy", { locale: localeId });
 }
 
+// Menggambar blok "Label : Nilai" dengan titik dua sejajar secara presisi.
+// Padding pakai spasi manual (mis. "Nomor     : x") tidak bisa dipakai untuk
+// ini karena Helvetica bukan font monospace -- lebar tiap karakter berbeda,
+// jadi titik duanya tidak akan sejajar walau jumlah spasinya "pas" di editor.
+function drawFieldBlock(
+  page: PDFPage,
+  font: PDFFont,
+  fields: { label: string; value: string; bold?: boolean }[],
+  x: number,
+  yStart: number,
+  size: number,
+  lh: number,
+  boldFont?: PDFFont
+): number {
+  const maxLabelWidth = Math.max(
+    ...fields.map((f) => font.widthOfTextAtSize(f.label, size))
+  );
+  const colonX = x + maxLabelWidth + 4;
+  const valueX = colonX + 8;
+  let y = yStart;
+  for (const f of fields) {
+    const useFont = f.bold && boldFont ? boldFont : font;
+    page.drawText(f.label, { x, y, size, font: useFont });
+    page.drawText(":", { x: colonX, y, size, font: useFont });
+    page.drawText(f.value, { x: valueX, y, size, font: useFont });
+    y -= lh;
+  }
+  return y;
+}
+
 export async function generateSuratPenerimaanPdf(
   data: SuratPenerimaanData
 ): Promise<Buffer> {
@@ -107,10 +137,21 @@ export async function generateSuratPenerimaanPdf(
     y -= lh;
   };
 
-  line(`Nomor     : ${data.nomorSurat}`);
-  line(`Sifat     : Biasa`);
-  line(`Lampiran  : -`);
-  line(`Hal       : Balasan Permohonan Magang`, bold);
+  y = drawFieldBlock(
+    page,
+    font,
+    [
+      { label: "Nomor", value: data.nomorSurat },
+      { label: "Sifat", value: "Biasa" },
+      { label: "Lampiran", value: "-" },
+      { label: "Hal", value: "Balasan Permohonan Magang", bold: true },
+    ],
+    left,
+    y,
+    size,
+    lh,
+    bold
+  );
   y -= lh;
 
   if (data.fakultas) {
@@ -246,12 +287,15 @@ export async function generateSuratSelesaiPdf(
   y = drawWrapped(page, font, isi, left, y, 495, size, lh);
   y -= lh / 2;
 
-  line(`Nama              : ${data.namaLengkap}`);
-  line(`Institusi         : ${data.institusi}`);
-  if (data.programStudi) line(`Program Studi     : ${data.programStudi}`);
-  if (data.nimNis) line(`NIM/NIS           : ${data.nimNis}`);
-  if (data.divisi) line(`Divisi/Bagian     : ${data.divisi}`);
-  line(`Periode Magang    : ${tgl(data.mulai)} s.d. ${tgl(data.selesai)}`);
+  const identityFields = [
+    { label: "Nama", value: data.namaLengkap },
+    { label: "Institusi", value: data.institusi },
+    ...(data.programStudi ? [{ label: "Program Studi", value: data.programStudi }] : []),
+    ...(data.nimNis ? [{ label: "NIM/NIS", value: data.nimNis }] : []),
+    ...(data.divisi ? [{ label: "Divisi/Bagian", value: data.divisi }] : []),
+    { label: "Periode Magang", value: `${tgl(data.mulai)} s.d. ${tgl(data.selesai)}` },
+  ];
+  y = drawFieldBlock(page, font, identityFields, left, y, size, lh);
   y -= lh;
 
   const penutup = `telah melaksanakan kegiatan magang dengan baik di Balai Layanan Perpustakaan sesuai periode tersebut di atas. Demikian surat keterangan ini dibuat untuk dapat dipergunakan sebagaimana mestinya.`;
