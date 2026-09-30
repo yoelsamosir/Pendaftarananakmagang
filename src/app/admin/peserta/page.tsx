@@ -6,11 +6,6 @@ import { Prisma } from "@prisma/client";
 
 const PAGE_SIZE = 10;
 
-const tabs: { value: "aktif" | "alumni"; label: string }[] = [
-  { value: "aktif", label: "Aktif Magang" },
-  { value: "alumni", label: "Alumni" },
-];
-
 export default async function AdminPesertaPage({
   searchParams,
 }: {
@@ -60,23 +55,9 @@ export default async function AdminPesertaPage({
 
   return (
     <div>
-      <h1 className="text-xl font-serif font-bold text-stone-900">Peserta Magang</h1>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {tabs.map((t) => (
-          <Link
-            key={t.value}
-            href={t.value === "aktif" ? "/admin/peserta" : `/admin/peserta?tab=${t.value}`}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium ${
-              tab === t.value
-                ? "bg-red-800 text-white"
-                : "bg-white text-stone-600 border border-stone-200"
-            }`}
-          >
-            {t.label}
-          </Link>
-        ))}
-      </div>
+      <h1 className="text-xl font-serif font-bold text-stone-900">
+        {tab === "alumni" ? "Peserta Magang - Alumni" : "Peserta Magang - Aktif Magang"}
+      </h1>
 
       <form className="mt-4" method="get">
         {tab !== "aktif" && <input type="hidden" name="tab" value={tab} />}

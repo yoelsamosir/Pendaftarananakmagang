@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { addDays, daysUntil, startOfToday } from "@/lib/time";
 
 async function getStats() {
   const [
@@ -10,6 +11,7 @@ async function getStats() {
     pesertaAktif,
     pengajuanSelesai,
     emailGagal,
+    akanSelesai,
     dokumenTerbaru,
   ] = await Promise.all([
     prisma.application.count({ where: { status: "DIAJUKAN" } }),
@@ -19,6 +21,16 @@ async function getStats() {
     prisma.user.count({ where: { role: "PESERTA", isActive: true } }),
     prisma.completionRequest.count({ where: { status: "DIAJUKAN" } }),
     prisma.emailLog.count({ where: { status: "FAILED" } }),
+    // Peserta aktif magang yang rencana selesainya H-7 sampai hari ini --
+    // supaya admin diingatkan dari seminggu sebelumnya, makin mendesak
+    // (ditandai merah) begitu masuk H-3.
+    prisma.application.findMany({
+      where: {
+        status: "DITERIMA",
+        rencanaSelesai: { gte: startOfToday(), lte: addDays(startOfToday(), 7) },
+      },
+      orderBy: { rencanaSelesai: "asc" },
+    }),
     prisma.document.findMany({
       orderBy: { createdAt: "desc" },
       take: 5,
@@ -33,6 +45,7 @@ async function getStats() {
     pesertaAktif,
     pengajuanSelesai,
     emailGagal,
+    akanSelesai,
     dokumenTerbaru,
   };
 }
@@ -63,6 +76,37 @@ export default async function AdminDashboardPage() {
           </p>
           <span className="text-xs text-red-700 underline">Lihat Email Log</span>
         </Link>
+      )}
+
+      {stats.akanSelesai.length > 0 && (
+        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <h2 className="text-sm font-semibold text-amber-900">
+            Peserta Akan Selesai Magang
+          </h2>
+          <ul className="mt-2 divide-y divide-amber-100">
+            {stats.akanSelesai.map((a) => {
+              const sisaHari = daysUntil(a.rencanaSelesai);
+              const mendesak = sisaHari <= 3;
+              return (
+                <li key={a.id} className="flex items-center justify-between py-2 text-sm">
+                  <Link
+                    href={`/admin/pengajuan/${a.id}`}
+                    className="font-medium text-red-800 hover:underline"
+                  >
+                    {a.namaLengkap}
+                  </Link>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      mendesak ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                    }`}
+                  >
+                    {sisaHari <= 0 ? "Selesai hari ini" : `H-${sisaHari}`}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">

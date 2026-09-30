@@ -18,10 +18,10 @@ export const applicationSchema = z.object({
   tanggalLahir: z.string().optional(),
 
   institusi: z.string().min(2, "Institusi wajib diisi").max(200),
-  fakultas: z.string().max(200).optional(),
-  programStudi: z.string().max(200).optional(),
-  nimNis: z.string().max(50).optional(),
-  semesterKelas: z.string().max(50).optional(),
+  fakultas: z.string().min(1, "Fakultas wajib diisi").max(200),
+  programStudi: z.string().min(1, "Program studi wajib diisi").max(200),
+  nimNis: z.string().min(1, "NIM/NIS wajib diisi").max(50),
+  semesterKelas: z.string().min(1, "Semester/kelas wajib diisi").max(50),
 
   jenisMagang: z.string().optional(),
   rencanaMulai: z.string().min(1, "Rencana mulai wajib diisi"),

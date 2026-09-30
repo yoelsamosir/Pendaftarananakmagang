@@ -6,6 +6,7 @@ import { generateNomorSurat } from "@/lib/nomor";
 import { generateSuratPenerimaanPdf } from "@/lib/pdf";
 import { saveGeneratedFile } from "@/lib/storage";
 import { sendNotificationEmail } from "@/lib/email";
+import { getEmailTemplate, renderTemplate } from "@/lib/emailTemplates";
 import { writeAuditLog } from "@/lib/audit";
 import { requireAwaitingDecision } from "@/lib/decisionGuard";
 import { DOCUMENT_TYPE_LABEL, PENGAJUAN_DOCUMENT_TYPES } from "@/lib/constants";
@@ -75,16 +76,27 @@ export async function POST(
       );
     }
 
-    const kuotaMessage =
-      "Mohon maaf, kuota/posisi magang untuk periode ini sudah penuh. Anda dapat mendaftar kembali untuk periode magang berikutnya.";
-    const genericMessage = `Mohon maaf, pengajuan magang Anda dengan nomor ${application.nomorPengajuan} belum dapat kami terima. ${
-      alasanTolak ? `Alasan: ${alasanTolak}` : ""
-    }`;
+    const alasan =
+      alasanTolakKategori === "KUOTA_PENUH"
+        ? "Kuota/posisi magang untuk periode ini sudah penuh. Anda dapat mendaftar kembali untuk periode magang berikutnya."
+        : alasanTolak
+          ? `Alasan: ${alasanTolak}`
+          : "";
+
+    const ditolakTemplate = await getEmailTemplate("DITOLAK");
+    const templateVars = {
+      nama: application.namaLengkap,
+      nomorPengajuan: application.nomorPengajuan,
+      alasan,
+    };
 
     await sendNotificationEmail({
       to: application.email,
-      subject: `Status Pengajuan Magang - ${application.nomorPengajuan}`,
-      body: alasanTolakKategori === "KUOTA_PENUH" ? kuotaMessage : genericMessage,
+      subject: renderTemplate(
+        ditolakTemplate.subject ?? `Status Pengajuan Magang - ${application.nomorPengajuan}`,
+        templateVars
+      ),
+      body: renderTemplate(ditolakTemplate.body, templateVars),
       type: "PENGAJUAN_DITOLAK",
       applicationId: application.id,
     });
@@ -124,12 +136,22 @@ export async function POST(
       .map((t) => `- ${DOCUMENT_TYPE_LABEL[t] ?? t}`)
       .join("\n");
 
+    const perluPerbaikanTemplate = await getEmailTemplate("PERLU_PERBAIKAN");
+    const templateVars = {
+      nama: application.namaLengkap,
+      nomorPengajuan: application.nomorPengajuan,
+      daftarDokumen: daftarDokumen || "(lihat catatan admin di bawah)",
+      catatanTambahan: catatanAdmin ? `\n\nCatatan tambahan: ${catatanAdmin}` : "",
+    };
+
     await sendNotificationEmail({
       to: application.email,
-      subject: `Perlu Perbaikan Pengajuan Magang - ${application.nomorPengajuan}`,
-      body: `Pengajuan magang Anda dengan nomor ${application.nomorPengajuan} memerlukan perbaikan. Anda TIDAK perlu mendaftar ulang — cukup lengkapi berkas berikut melalui halaman Cek Status pada website kami:\n${
-        daftarDokumen || "(lihat catatan admin di bawah)"
-      }${catatanAdmin ? `\n\nCatatan tambahan: ${catatanAdmin}` : ""}`,
+      subject: renderTemplate(
+        perluPerbaikanTemplate.subject ??
+          `Perlu Perbaikan Pengajuan Magang - ${application.nomorPengajuan}`,
+        templateVars
+      ),
+      body: renderTemplate(perluPerbaikanTemplate.body, templateVars),
       type: "PENGAJUAN_PERLU_PERBAIKAN",
       applicationId: application.id,
     });
@@ -310,11 +332,32 @@ export async function POST(
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const setupUrl = `${siteUrl}/setup-password?token=${setupToken}`;
 
+  const [diterimaTemplate, tataTertibTemplate] = await Promise.all([
+    getEmailTemplate("DITERIMA"),
+    getEmailTemplate("TATA_TERTIB"),
+  ]);
+  const diterimaVars = {
+    nama: application.namaLengkap,
+    nomorPengajuan: application.nomorPengajuan,
+    link: setupUrl,
+  };
+  const tataTertibText = renderTemplate(tataTertibTemplate.body, {
+    nama: application.namaLengkap,
+  });
+  const diterimaBody = renderTemplate(diterimaTemplate.body, diterimaVars);
+  const diterimaBodyLog = renderTemplate(diterimaTemplate.body, {
+    ...diterimaVars,
+    link: "(tautan setup password tidak disimpan di log ini)",
+  });
+
   await sendNotificationEmail({
     to: application.email,
-    subject: `Selamat! Pengajuan Magang Diterima - ${application.nomorPengajuan}`,
-    body: `Selamat ${application.namaLengkap}, pengajuan magang Anda telah DITERIMA. Surat penerimaan sudah tersedia di dashboard. Akun Anda telah dibuat, silakan atur password melalui tautan berikut: ${setupUrl}`,
-    logBody: `Selamat ${application.namaLengkap}, pengajuan magang Anda telah DITERIMA. Surat penerimaan sudah tersedia di dashboard. Akun Anda telah dibuat, silakan atur password melalui tautan setup password (tidak disimpan di log ini).`,
+    subject: renderTemplate(
+      diterimaTemplate.subject ?? `Selamat! Pengajuan Magang Diterima - ${application.nomorPengajuan}`,
+      diterimaVars
+    ),
+    body: `${diterimaBody}\n\n${tataTertibText}`,
+    logBody: `${diterimaBodyLog}\n\n${tataTertibText}`,
     type: "PENGAJUAN_DITERIMA",
     applicationId: application.id,
   });

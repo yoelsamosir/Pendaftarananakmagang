@@ -147,10 +147,10 @@ export default function DaftarPage() {
                 name="institusi"
                 required
               />
-              <Field label="Fakultas" name="fakultas" />
-              <Field label="Program Studi" name="programStudi" />
-              <Field label="NIM / NIS" name="nimNis" />
-              <Field label="Semester / Kelas" name="semesterKelas" />
+              <Field label="Fakultas" name="fakultas" required />
+              <Field label="Program Studi" name="programStudi" required />
+              <Field label="NIM / NIS" name="nimNis" required />
+              <Field label="Semester / Kelas" name="semesterKelas" required />
             </div>
           </fieldset>
 
@@ -159,7 +159,22 @@ export default function DaftarPage() {
               3. Data Magang
             </legend>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Jenis / Kategori Magang" name="jenisMagang" />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-stone-700">
+                  Jenis / Kategori Magang
+                </label>
+                <select
+                  name="jenisMagang"
+                  defaultValue=""
+                  className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-red-600 focus:outline-none"
+                >
+                  <option value="" disabled hidden>
+                    Pilih jenis magang
+                  </option>
+                  <option value="Mandiri">Mandiri</option>
+                  <option value="Wajib">Wajib</option>
+                </select>
+              </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-stone-700">
                   Divisi / Bagian (jika sudah diketahui)
@@ -188,7 +203,6 @@ export default function DaftarPage() {
                 required
                 minDate={new Date()}
               />
-              <Field label="Durasi" name="durasi" placeholder="mis. 2 bulan" />
             </div>
             <p className="text-xs text-stone-500">
               Rencana mulai magang minimal {MIN_DAYS_BEFORE_MULAI} hari dari
