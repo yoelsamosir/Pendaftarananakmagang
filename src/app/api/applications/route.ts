@@ -12,7 +12,7 @@ import { writeAuditLog } from "@/lib/audit";
 import { INSTANSI_NAME } from "@/lib/constants";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { detectDocumentType } from "@/lib/fileSignature";
-import { minRencanaMulaiDate, MIN_DAYS_BEFORE_MULAI } from "@/lib/internshipRules";
+import { minRencanaMulaiUtc, MIN_DAYS_BEFORE_MULAI } from "@/lib/internshipRules";
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  if (mulai < minRencanaMulaiDate()) {
+  if (mulai < minRencanaMulaiUtc()) {
     return NextResponse.json(
       {
         error: `Rencana mulai magang minimal ${MIN_DAYS_BEFORE_MULAI} hari dari hari ini`,
