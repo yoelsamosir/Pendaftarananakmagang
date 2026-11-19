@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
-/* Tema tetap: "perpustakaan" (krem hangat + hijau tua + emas). Situs ini
-   sengaja tidak mengikuti prefers-color-scheme perangkat — warna gelap/hitam
-   otomatis dari sistem operasi/browser TIDAK dipakai di sini. */
+/* Tema tetap mengikuti logo Balai Yanpus (lambang DIY): merah logo #C4211C,
+   emas bintang/sayap, di atas latar krem hangat. Situs ini sengaja tidak
+   mengikuti prefers-color-scheme perangkat — warna gelap otomatis dari sistem
+   operasi/browser TIDAK dipakai di sini. */
 :root {
-  --background: #fafaf9; /* stone-50 */
+  --background: #faf8f5; /* stone-50 */
   --foreground: #1c1917; /* stone-900 */
+  color-scheme: light;
 }
 
 @theme inline {
@@ -14,6 +16,39 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-lora);
+}
+
+/* Palet `red` dan `amber` bawaan Tailwind diganti dengan turunan warna logo,
+   supaya seluruh kelas yang sudah ada (bg-red-800, text-amber-700, dst.)
+   otomatis ikut warna resmi tanpa mengubah tiap komponen. red-700 = merah
+   logo; amber-500 = emas lambang. */
+@theme {
+  --color-red-50: #fef3f2;
+  --color-red-100: #fce5e3;
+  --color-red-200: #f9cdca;
+  --color-red-300: #f4a7a3;
+  --color-red-400: #ec7670;
+  --color-red-500: #e2463f;
+  --color-red-600: #d42a24;
+  --color-red-700: #c4211c;
+  --color-red-800: #a11a16;
+  --color-red-900: #7f1813;
+  --color-red-950: #450a08;
+
+  --color-amber-50: #fdf9ec;
+  --color-amber-100: #faf0cc;
+  --color-amber-200: #f4df95;
+  --color-amber-300: #edc95c;
+  --color-amber-400: #e5b434;
+  --color-amber-500: #d49a1c;
+  --color-amber-600: #b87a14;
+  --color-amber-700: #935a14;
+  --color-amber-800: #794817;
+  --color-amber-900: #663c18;
+  --color-amber-950: #3b1f09;
+
+  --color-stone-50: #faf8f5;
+  --color-stone-100: #f3efe9;
 }
 
 body {
