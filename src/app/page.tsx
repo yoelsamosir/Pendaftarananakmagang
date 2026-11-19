@@ -41,7 +41,7 @@ const layananInfo = [
       "Ajukan permohonan sesuai persyaratan di atas.",
       "Surat diterima paling lambat 7 hari sebelum pelaksanaan magang.",
       "Petugas memproses permohonan magang.",
-      "Informasi diterima/tidak diterima disampaikan melalui WhatsApp, paling lambat 3 hari kerja setelah surat diterima.",
+      "Informasi diterima/tidak diterima dikirim melalui email yang Anda daftarkan dan dapat dicek di halaman Cek Status, paling lambat 3 hari kerja setelah surat diterima.",
       "Pemohon yang diterima selanjutnya dapat menghubungi pendamping magang yang ditunjuk.",
     ],
   },
