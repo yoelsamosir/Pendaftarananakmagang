@@ -82,12 +82,43 @@ const faq = [
   },
 ];
 
+// Faks sengaja tanpa tautan -- tidak ada skema URL yang berguna untuk faks.
+const kontak = [
+  { label: "WhatsApp", value: "0881-2658-192", href: "https://wa.me/628812658192" },
+  { label: "Telepon", value: "(0274) 4536233", href: "tel:+622744536233" },
+  { label: "Faks", value: "(0274) 4536234", href: null },
+  {
+    label: "Email",
+    value: "balaiyanpus@jogjaprov.go.id",
+    href: "mailto:balaiyanpus@jogjaprov.go.id",
+  },
+];
+
+const mediaSosial = [
+  {
+    label: "Facebook",
+    value: "@balaiyanpus.dpaddiy",
+    href: "https://www.facebook.com/balaiyanpus.dpaddiy",
+  },
+  {
+    label: "Instagram",
+    value: "@balaiyanpus.dpaddiy",
+    href: "https://www.instagram.com/balaiyanpus.dpaddiy",
+  },
+  { label: "X (Twitter)", value: "@yanpus_dpaddiy", href: "https://x.com/yanpus_dpaddiy" },
+  {
+    label: "Website resmi",
+    value: "balaiyanpus.jogjaprov.go.id",
+    href: "https://balaiyanpus.jogjaprov.go.id",
+  },
+];
+
 export default function HomePage() {
   return (
     <div className="flex min-h-full flex-col">
       <PublicNavbar />
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-red-700 via-red-800 to-red-950 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#7a1216] via-[#5c0b0e] to-[#460809] text-white">
         {/* Motif lingkaran emas samar sebagai latar, gaya bingkai lambang */}
         <div
           aria-hidden
@@ -107,7 +138,7 @@ export default function HomePage() {
               Sistem Informasi Manajemen Magang Balai Layanan Perpustakaan
               Pemda DIY
             </h1>
-            <p className="mt-5 max-w-2xl text-red-100">
+            <p className="mt-5 max-w-2xl text-stone-300">
               Pendaftaran magang kini dilakukan sepenuhnya secara online
               melalui website ini — isi formulir, unggah dokumen, pantau
               status pengajuan, dan kelola seluruh dokumen serta jadwal
@@ -129,7 +160,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="hidden shrink-0 md:block">
-            <div className="flex h-56 w-56 items-center justify-center rounded-full bg-stone-50 shadow-2xl shadow-red-950/40 ring-4 ring-amber-400 ring-offset-4 ring-offset-red-800">
+            <div className="flex h-56 w-56 items-center justify-center rounded-full bg-stone-50 shadow-2xl shadow-red-950/40 ring-4 ring-amber-400 ring-offset-4 ring-offset-[#5c0b0e]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/icon.png" alt="Lambang Daerah Istimewa Yogyakarta" className="h-40 w-auto" />
             </div>
@@ -279,7 +310,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer id="kontak" className="border-t-4 border-amber-400 bg-red-950 text-stone-300">
+      <footer id="kontak" className="border-t-4 border-amber-400 bg-[#460809] text-stone-300">
         <div className="mx-auto max-w-6xl px-4 py-10 text-sm sm:px-6">
           <p className="font-serif font-semibold text-white">
             Balai Layanan Perpustakaan
@@ -288,9 +319,14 @@ export default function HomePage() {
             Dinas Perpustakaan dan Arsip Daerah, Pemerintah Daerah Daerah
             Istimewa Yogyakarta
           </p>
-          <p className="mt-1 text-stone-400">
-            Gedung Grhatama Pustaka, Jl. Janti, Banguntapan, Bantul, DIY
-          </p>
+          <a
+            href="https://www.google.com/maps/search/?api=1&query=Grhatama+Pustaka+Jl.+Janti+Banguntapan+Bantul"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1 inline-block text-stone-400 hover:text-amber-300 hover:underline"
+          >
+            Gedung Grhatama Pustaka, Jl. Janti, Banguntapan, Bantul, DIY ↗
+          </a>
 
           <div className="mt-6 grid gap-6 sm:grid-cols-2">
             <div>
@@ -298,10 +334,23 @@ export default function HomePage() {
                 Kontak
               </p>
               <ul className="mt-2 space-y-1 text-stone-300">
-                <li>WhatsApp: 0881-2658-192</li>
-                <li>Telepon: (0274) 4536233</li>
-                <li>Faks: (0274) 4536234</li>
-                <li>Email: balaiyanpus@jogjaprov.go.id</li>
+                {kontak.map((k) => (
+                  <li key={k.label}>
+                    {k.label}:{" "}
+                    {k.href ? (
+                      <a
+                        href={k.href}
+                        target={k.href.startsWith("http") ? "_blank" : undefined}
+                        rel="noreferrer"
+                        className="text-stone-100 hover:text-amber-300 hover:underline"
+                      >
+                        {k.value}
+                      </a>
+                    ) : (
+                      k.value
+                    )}
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
@@ -309,20 +358,19 @@ export default function HomePage() {
                 Media Sosial
               </p>
               <ul className="mt-2 space-y-1 text-stone-300">
-                <li>Facebook: @balaiyanpus.dpaddiy</li>
-                <li>Instagram: @balaiyanpus.dpaddiy</li>
-                <li>X (Twitter): @yanpus_dpaddiy</li>
-                <li>
-                  Website resmi:{" "}
-                  <a
-                    href="https://balaiyanpus.jogjaprov.go.id"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-amber-300 hover:underline"
-                  >
-                    balaiyanpus.jogjaprov.go.id
-                  </a>
-                </li>
+                {mediaSosial.map((m) => (
+                  <li key={m.label}>
+                    {m.label}:{" "}
+                    <a
+                      href={m.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-stone-100 hover:text-amber-300 hover:underline"
+                    >
+                      {m.value}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
